@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { MiniDNA } from './DNA3D'
 
 const F = "'Times New Roman', Georgia, serif"
 const FM = "'DM Mono', monospace"
@@ -28,14 +29,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <div style={{
-                width: 34, height: 34, borderRadius: '50%',
-                background: 'linear-gradient(145deg, rgba(212,175,55,0.2), rgba(212,175,55,0.08))',
-                border: '1px solid rgba(212,175,55,0.3)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, fontWeight: 700, color: '#D4AF37', fontFamily: F,
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(212,175,55,0.2)',
-              }}>H</div>
+              <MiniDNA color="#2196F3" />
               <span style={{ fontFamily: F, fontWeight: 700, fontSize: 16, letterSpacing: 3, color: '#F5F3F0' }}>HEALIX</span>
             </div>
             <p style={{ fontSize: 14, color: 'rgba(245,243,240,0.45)', lineHeight: 1.75, maxWidth: 260, fontFamily: F }}>

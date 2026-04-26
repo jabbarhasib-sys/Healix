@@ -7,6 +7,11 @@ const useStore = create((set) => ({
   pipelineLabel:   '',
   completedStages: [],
   result:          null,
+  patientName:      '',
+  patientAge:       '',
+  patientGender:    '',
+  location:         null,
+  nearbyHospitals:  [],
   error:           null,
 
   // Setters
@@ -23,9 +28,16 @@ const useStore = create((set) => ({
 
   resetPipeline: () => set({ pipelineStage: null, pipelineLabel: '', completedStages: [], error: null }),
 
+  setPatientName:   (n) => set({ patientName: n }),
+  setPatientAge:    (a) => set({ patientAge: a }),
+  setPatientGender: (g) => set({ patientGender: g }),
+  setLocation:      (l) => set({ location: l }),
+  setNearbyHospitals: (h) => set({ nearbyHospitals: h }),
+
   reset: () => set({
     symptomsText: '', sessionId: null, pipelineStage: null,
     pipelineLabel: '', completedStages: [], result: null, error: null,
+    patientName: '', patientAge: '', patientGender: '', location: null, nearbyHospitals: []
   }),
 }))
 

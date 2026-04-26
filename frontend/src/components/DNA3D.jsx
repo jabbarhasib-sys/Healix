@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Float, Environment } from '@react-three/drei'
 import * as THREE from 'three'
@@ -12,10 +12,11 @@ export function MetallicDNA({ isVertical = false, color = '#E2E8F0' }) {
   const height = 40
   
   // Generate continuous strands and nodes
-  const { curve1, curve2, rungs, nodes } = useMemo(() => {
+  const { curve1, curve2, innerCurve1, innerCurve2, nodes } = useMemo(() => {
     const points1 = []
     const points2 = []
-    const rungsArr = []
+    const innerPoints1 = []
+    const innerPoints2 = []
     const nodesArr = []
     
     const steps = numPairs * 2
@@ -32,10 +33,17 @@ export function MetallicDNA({ isVertical = false, color = '#E2E8F0' }) {
       const z2 = Math.sin(angle + Math.PI) * radius
       points2.push(new THREE.Vector3(x2, y, z2))
       
-      // Floating box rungs
-      if (i > 0 && i < steps && i % 2 === 0) {
-        rungsArr.push({ y, angle })
-      }
+      // Inner helix
+      const innerRadius = radius * 0.4
+      const innerAngle = angle - Math.PI / 4 // Offset phase slightly
+      
+      const ix1 = Math.cos(innerAngle) * innerRadius
+      const iz1 = Math.sin(innerAngle) * innerRadius
+      innerPoints1.push(new THREE.Vector3(ix1, y, iz1))
+      
+      const ix2 = Math.cos(innerAngle + Math.PI) * innerRadius
+      const iz2 = Math.sin(innerAngle + Math.PI) * innerRadius
+      innerPoints2.push(new THREE.Vector3(ix2, y, iz2))
 
       // Random circuit nodes along the backbone
       if (i % 3 === 0 && i !== 0 && i !== steps) {
@@ -47,7 +55,8 @@ export function MetallicDNA({ isVertical = false, color = '#E2E8F0' }) {
     return {
       curve1: new THREE.CatmullRomCurve3(points1),
       curve2: new THREE.CatmullRomCurve3(points2),
-      rungs: rungsArr,
+      innerCurve1: new THREE.CatmullRomCurve3(innerPoints1),
+      innerCurve2: new THREE.CatmullRomCurve3(innerPoints2),
       nodes: nodesArr
     }
   }, [numPairs, radius, height])
@@ -83,13 +92,17 @@ export function MetallicDNA({ isVertical = false, color = '#E2E8F0' }) {
           <meshPhysicalMaterial attach="material" {...materialProps} />
         </mesh>
 
-        {/* Floating Rungs */}
-        {rungs.map((r, i) => (
-          <mesh key={`rung-${i}`} position={[0, r.y, 0]} rotation={[0, -r.angle, 0]}>
-            <boxGeometry args={[radius * 1.3, 0.25, 0.6]} /> {/* Doesn't touch backbones */}
-            <meshPhysicalMaterial attach="material" {...materialProps} />
-          </mesh>
-        ))}
+        {/* Inner Helix 1 */}
+        <mesh>
+          <tubeGeometry args={[innerCurve1, 64, 0.12, 12, false]} />
+          <meshPhysicalMaterial attach="material" {...materialProps} />
+        </mesh>
+        
+        {/* Inner Helix 2 */}
+        <mesh>
+          <tubeGeometry args={[innerCurve2, 64, 0.12, 12, false]} />
+          <meshPhysicalMaterial attach="material" {...materialProps} />
+        </mesh>
 
         {/* Circuit Nodes */}
         {nodes.map((n, i) => (
@@ -108,23 +121,24 @@ export function MetallicDNA({ isVertical = false, color = '#E2E8F0' }) {
   )
 }
 
-export function MiniDNA() {
+export function MiniDNA({ color = '#1976D2' }) {
   return (
     <div style={{ width: 44, height: 44, pointerEvents: 'none' }}>
       <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[10, 20, 10]} intensity={2} color="#ffffff" />
-        <directionalLight position={[-10, -10, -10]} intensity={1} color="#a0c0ff" />
-        <Environment preset="studio" />
-        <group scale={0.4}>
-          <MetallicDNA isVertical={true} color="#1976D2" />
-        </group>
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[10, 20, 10]} intensity={2} color="#ffffff" />
+          <directionalLight position={[-10, -10, -10]} intensity={1} color="#a0c0ff" />
+          <Environment preset="studio" />
+          <group scale={0.4}>
+            <MetallicDNA isVertical={true} color={color} />
+          </group>
+        </Suspense>
       </Canvas>
     </div>
   )
 }
 
-import { Suspense } from 'react'
 
 export default function DNA3D() {
   return (

@@ -40,11 +40,11 @@ export default function HospitalMatches() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48, flexWrap: 'wrap', gap: 24 }}>
           <SectionReveal>
             <div className="label" style={{ marginBottom: 12 }}>Matched Facilities</div>
-            <h1 style={{ 
-              fontSize: 'clamp(32px,5vw,52px)', 
-              fontWeight: 700, 
-              letterSpacing: -1.5, 
-              lineHeight: 1.05, 
+            <h1 style={{
+              fontSize: 'clamp(32px,5vw,52px)',
+              fontWeight: 700,
+              letterSpacing: -1.5,
+              lineHeight: 1.05,
               color: '#0B1F3D',
               fontFamily: F
             }}>
@@ -106,6 +106,7 @@ export default function HospitalMatches() {
 
         <p style={{ textAlign: 'center', fontSize: 12, color: '#8A97A6', fontStyle: 'italic', fontFamily: F }}>
           HEALIX AI · Intelligence Exchange · National Hackathon 2026
+          By team Neural Navigators
         </p>
       </div>
 

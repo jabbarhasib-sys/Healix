@@ -23,6 +23,7 @@ export default function About() {
             <p style={{ fontSize: 18, color: '#6B7B8D', maxWidth: 600, margin: '0 auto', lineHeight: 1.8 }}>
               HEALIX is a 6-module AI pipeline designed to democratize clinical reasoning.
               Built for the National Hackathon 2026 by Intelligence Exchange.
+              By Team Neural Navigators.
             </p>
           </div>
         </SectionReveal>
