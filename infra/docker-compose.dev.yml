@@ -1,0 +1,35 @@
+version: "3.9"
+
+# Dev override — hot reload, no nginx, exposed ports
+# Usage: docker-compose -f docker-compose.yml -f infra/docker-compose.dev.yml up
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app          # hot reload via uvicorn --reload
+      - ./data:/app/data
+    environment:
+      - APP_ENV=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql://healix:healix@postgres:5432/healix_db
+      - REDIS_URL=redis://redis:6379/0
+      - OLLAMA_BASE_URL=http://ollama:11434
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  ollama:
+    ports:
+      - "11434:11434"

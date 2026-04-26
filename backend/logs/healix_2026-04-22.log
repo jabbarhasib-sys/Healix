@@ -1,0 +1,3 @@
+2026-04-22 14:58:20 | ERROR    | __main__:main:155 | data\synthetic\symptom_training_data.csv not found. Run generate_symptoms.py first.
+2026-04-22 14:59:03 | ERROR    | __main__:main:155 | data\synthetic\symptom_training_data.csv not found. Run generate_symptoms.py first.
+2026-04-22 14:59:03 | ERROR    | __main__:main:164 | data\synthetic\cost_training_data.csv not found. Run generate_costs.py first.
