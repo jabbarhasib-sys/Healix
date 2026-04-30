@@ -17,7 +17,7 @@ const FAQ = [
 const CONTACTS = [
   { id: 'E', label: 'Primary', value: 'support@healix.ai', href: 'mailto:support@healix.ai' },
   { id: 'B', label: 'Technical', value: 'bugs@healix.ai', href: 'mailto:bugs@healix.ai' },
-  { id: 'H', label: 'Hackathon', value: 'team@healix.ai', href: 'mailto:team@healix.ai' },
+  { id: 'J', label: 'Developer', value: 'jabbar.hasib@gmail.com', href: 'mailto:jabbar.hasib@gmail.com' },
 ]
 
 const STEPS = [

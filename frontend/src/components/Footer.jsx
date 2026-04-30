@@ -82,8 +82,14 @@ export default function Footer() {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <p style={{ fontSize: 12, color: 'rgba(245,243,240,0.25)', margin: 0, fontFamily: F }}>
-            © {year} HEALIX AI · Intelligence Exchange · National Hackathon 2026
+            © {year} HEALIX AI · Built by Jabbar Hasib
           </p>
+          <a href="mailto:jabbar.hasib@gmail.com"
+            style={{ fontSize: 12, color: 'rgba(245,243,240,0.35)', margin: 0, fontFamily: F, textDecoration: 'none', transition: 'color 0.2s' }}
+            onMouseEnter={e => e.target.style.color = 'rgba(212,175,55,0.8)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(245,243,240,0.35)'}>
+            jabbar.hasib@gmail.com
+          </a>
           <p style={{ fontSize: 11, color: 'rgba(245,243,240,0.18)', margin: 0, fontStyle: 'italic', fontFamily: F }}>
             Not a substitute for professional medical advice.
           </p>

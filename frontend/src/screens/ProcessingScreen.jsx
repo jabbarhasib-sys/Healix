@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { streamPipeline } from '../services/api'
 import DNA3D from '../components/DNA3D'
+import { useDarkMode } from '../hooks/useDarkMode'
 
 const F = "'Times New Roman', Georgia, serif"
 const FM = "'DM Mono', monospace"
@@ -26,6 +27,7 @@ export default function ProcessingScreen() {
     pipelineStage, completedStages,
     setResult, setPipelineStage, resetPipeline, setError,
   } = useStore()
+  const [isDark] = useDarkMode()
 
   const [errorMsg, setErrorMsg] = useState(null)
   // Visual stage ticker — animates stages every 2.2s while waiting for backend
@@ -74,7 +76,7 @@ export default function ProcessingScreen() {
   const progress = completedStages.length / STAGES.length
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F3F0', fontFamily: F, position: 'relative', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: isDark ? '#1e2229' : '#F5F3F0', fontFamily: F, position: 'relative', overflowX: 'hidden' }}>
       <DNA3D />
       <Navbar />
 

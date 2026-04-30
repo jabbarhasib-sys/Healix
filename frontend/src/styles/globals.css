@@ -26,6 +26,492 @@
     font-size: 16px;
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     HEALIX — INDUSTRIAL DSO DARK MODE THEME
+     Digital Storage Oscilloscope aesthetic
+     Teal #38b2ac · Amber #d4a052 · Charcoal #1e2229
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* ── CSS Custom Properties (DSO palette) ─────────────────────── */
+  html.dark {
+    --dso-bg:         #1e2229;
+    --dso-panel:      #272d36;
+    --dso-bezel:      #2a3039;
+    --dso-lcd:        #141920;
+    --dso-teal:       #38b2ac;
+    --dso-teal-glow:  rgba(56, 178, 172, 0.4);
+    --dso-amber:      #d4a052;
+    --dso-amber-glow: rgba(212, 160, 82, 0.4);
+    --dso-text:       #e8ecf1;
+    --dso-muted:      #6b7a8d;
+    --neo-shadow:     6px 6px 14px rgba(10,12,16,0.65), -6px -6px 14px rgba(55,63,75,0.35);
+    --neo-inset:      inset 4px 4px 10px rgba(10,12,16,0.6), inset -4px -4px 10px rgba(55,63,75,0.25);
+    --neo-deep:       inset 6px 6px 14px rgba(10,12,16,0.7), inset -6px -6px 14px rgba(55,63,75,0.2);
+  }
+
+  /* ── Flash keyframe for toggle ────────────────────────────────── */
+  @keyframes healixFlash {
+    0%   { opacity: 0; }
+    15%  { opacity: 0.22; }
+    100% { opacity: 0; }
+  }
+
+  /* ── Smooth element transitions on toggle ─────────────────────── */
+  html.dark-transitioning * {
+    transition:
+      background      0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      color           0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color    0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow      0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* ── DSO Animations ───────────────────────────────────────────── */
+
+  /* CRT scanline sweep */
+  @keyframes crtScanline {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+
+  /* Breathing glow */
+  @keyframes breatheGlow {
+    0%, 100% { opacity: 0; }
+    50%       { opacity: 0.08; }
+  }
+
+  /* Haptic snap micro-shake */
+  @keyframes hapticSnap {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    20%  { transform: translate(1.5px, 0) rotate(0.3deg); }
+    40%  { transform: translate(-1.5px, 0) rotate(-0.3deg); }
+    60%  { transform: translate(1px, 0) rotate(0.15deg); }
+    80%  { transform: translate(-0.5px, 0) rotate(-0.1deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  /* LED pulse */
+  @keyframes ledPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--dso-teal-glow), 0 0 20px rgba(56,178,172,0.2); }
+    50%       { opacity: 0.7; box-shadow: 0 0 4px var(--dso-teal-glow); }
+  }
+
+  /* Amber LED pulse */
+  @keyframes amberPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--dso-amber-glow), 0 0 20px rgba(212,160,82,0.2); }
+    50%       { opacity: 0.7; box-shadow: 0 0 4px var(--dso-amber-glow); }
+  }
+
+  /* Teal scanline across LCD panels */
+  @keyframes scanline {
+    0%   { top: -2px; }
+    100% { top: 100%; }
+  }
+
+  /* ── Root / Body ──────────────────────────────────────────────── */
+  html.dark,
+  html.dark body,
+  html.dark #root {
+    background: var(--dso-bg) !important;
+    color:      var(--dso-text) !important;
+    font-family: 'DM Sans', 'DM Mono', monospace;
+  }
+
+  /* Scanline overlay on entire page */
+  html.dark body::before {
+    content: '';
+    position: fixed;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(transparent, rgba(56,178,172,0.18), transparent);
+    pointer-events: none;
+    z-index: 9998;
+    animation: scanline 4s linear infinite;
+  }
+
+  /* Breathing glow radial — subtle ambient */
+  html.dark body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(56,178,172,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 70%, rgba(212,160,82,0.04) 0%, transparent 55%);
+    animation: breatheGlow 3s ease-in-out infinite;
+  }
+
+  /* ── Headings ─────────────────────────────────────────────────── */
+  html.dark h1, html.dark h2, html.dark h3,
+  html.dark h4, html.dark h5, html.dark h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    color:       var(--dso-text) !important;
+    font-weight: 800 !important;
+    text-shadow: 0 0 30px rgba(56,178,172,0.12);
+  }
+
+  /* ── Cards → DSO Panel Surface ───────────────────────────────── */
+  html.dark .card {
+    background:   var(--dso-panel) !important;
+    border:       1px solid rgba(56,178,172,0.12) !important;
+    color:        var(--dso-text) !important;
+    box-shadow:   var(--neo-shadow) !important;
+    position:     relative;
+    overflow:     hidden;
+  }
+  /* Teal corner accent on each card */
+  html.dark .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 40px;
+    background: linear-gradient(to bottom, var(--dso-teal), transparent);
+    border-radius: 0 0 2px 0;
+  }
+  html.dark .card:hover {
+    border-color: rgba(56,178,172,0.35) !important;
+    box-shadow:
+      var(--neo-shadow),
+      0 0 0 1px rgba(56,178,172,0.25),
+      0 0 24px rgba(56,178,172,0.08) !important;
+  }
+
+  /* ── Panel-3D (active stage) → glowing teal bezel ────────────── */
+  html.dark .panel-3d {
+    background:   var(--dso-bezel) !important;
+    border-color: var(--dso-teal) !important;
+    box-shadow:
+      var(--neo-inset),
+      0 0 0 1px var(--dso-teal),
+      0 0 20px var(--dso-teal-glow),
+      0 0 40px rgba(56,178,172,0.12) !important;
+    animation: ledPulse 2s ease-in-out infinite !important;
+  }
+
+  /* ── Navbar → Industrial brand strip ─────────────────────────── */
+  html.dark nav {
+    background:    linear-gradient(90deg, #272d36, #313842, #272d36) !important;
+    border-color:  rgba(56,178,172,0.15) !important;
+    border-bottom: 1px solid rgba(56,178,172,0.2) !important;
+    box-shadow:    0 2px 0 rgba(56,178,172,0.1), 0 4px 20px rgba(10,12,16,0.6) !important;
+    backdrop-filter: blur(20px) !important;
+  }
+
+  /* ── Labels & Text ────────────────────────────────────────────── */
+  html.dark p            { color: rgba(232,236,241,0.68) !important; }
+  html.dark span         { color: inherit; }
+  html.dark .label       {
+    font-family:    'DM Sans', monospace !important;
+    font-size:      9px !important;
+    letter-spacing: 2.5px !important;
+    text-transform: uppercase !important;
+    color:          var(--dso-teal) !important;
+    font-weight:    500 !important;
+  }
+  html.dark .label-muted {
+    color:          var(--dso-muted) !important;
+    font-family:    'DM Sans', monospace !important;
+    letter-spacing: 1.5px !important;
+  }
+  html.dark .data-label  {
+    color:          var(--dso-muted) !important;
+    font-family:    'DM Sans', monospace !important;
+    font-size:      9px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+  }
+
+  /* ── Inputs → DSO inset bezel ─────────────────────────────────── */
+  html.dark input,
+  html.dark select,
+  html.dark textarea {
+    background:   var(--dso-lcd) !important;
+    color:        var(--dso-text) !important;
+    border:       1px solid rgba(56,178,172,0.2) !important;
+    box-shadow:   var(--neo-inset) !important;
+    font-family:  'DM Sans', monospace !important;
+  }
+  html.dark input:focus,
+  html.dark select:focus,
+  html.dark textarea:focus {
+    border-color: var(--dso-teal) !important;
+    box-shadow:   var(--neo-inset), 0 0 0 2px rgba(56,178,172,0.2), 0 0 12px rgba(56,178,172,0.15) !important;
+    outline: none !important;
+  }
+  html.dark input::placeholder,
+  html.dark textarea::placeholder {
+    color: var(--dso-muted) !important;
+  }
+
+  /* ── Buttons → Tactical controls ─────────────────────────────── */
+  html.dark .btn-primary {
+    background:   linear-gradient(135deg, #3a9e98 0%, #2d8a84 100%) !important;
+    color:        #ffffff !important;
+    border:       1px solid rgba(56,178,172,0.5) !important;
+    box-shadow:   var(--neo-shadow), 0 0 12px rgba(56,178,172,0.25) !important;
+    font-family:  'DM Sans', sans-serif !important;
+    font-weight:  500 !important;
+    letter-spacing: 0.5px !important;
+    transition:   all 0.15s ease !important;
+  }
+  html.dark .btn-primary:hover {
+    background:   linear-gradient(135deg, #44b5ae 0%, #38a09a 100%) !important;
+    box-shadow:   var(--neo-shadow), 0 0 20px rgba(56,178,172,0.4) !important;
+    transform:    translateY(-1px) !important;
+  }
+  html.dark .btn-primary:active {
+    box-shadow:   var(--neo-inset) !important;
+    transform:    translateY(1px) scale(0.98) !important;
+    animation:    hapticSnap 0.2s steps(5) !important;
+  }
+  html.dark .btn-outline {
+    background:   var(--dso-panel) !important;
+    color:        var(--dso-teal) !important;
+    border:       1px solid rgba(56,178,172,0.35) !important;
+    box-shadow:   var(--neo-shadow) !important;
+    font-family:  'DM Sans', sans-serif !important;
+  }
+  html.dark .btn-outline:hover {
+    border-color: var(--dso-teal) !important;
+    box-shadow:   var(--neo-shadow), 0 0 12px rgba(56,178,172,0.2) !important;
+  }
+  html.dark .btn-outline:active {
+    box-shadow:   var(--neo-inset) !important;
+    transform:    translateY(1px) scale(0.98) !important;
+  }
+
+  /* ── Badges ───────────────────────────────────────────────────── */
+  html.dark .badge-gold {
+    background:   rgba(212,160,82,0.15) !important;
+    color:        var(--dso-amber) !important;
+    border:       1px solid rgba(212,160,82,0.25) !important;
+    box-shadow:   0 0 8px rgba(212,160,82,0.1) !important;
+    font-family:  'DM Sans', monospace !important;
+    font-size:    9px !important;
+    letter-spacing: 1.5px !important;
+  }
+  html.dark .badge-navy {
+    background:   rgba(56,178,172,0.1) !important;
+    color:        var(--dso-teal) !important;
+    border:       1px solid rgba(56,178,172,0.2) !important;
+    font-family:  'DM Sans', monospace !important;
+  }
+
+  /* ── Icon circles → LED-style indicators ─────────────────────── */
+  html.dark .icon-3d-navy {
+    background: linear-gradient(135deg, #3a9e98, #2d8a84) !important;
+    color:      #ffffff !important;
+    box-shadow: var(--neo-shadow), 0 0 12px rgba(56,178,172,0.3) !important;
+    font-family: 'DM Sans', monospace !important;
+    font-weight: 700 !important;
+  }
+  html.dark .icon-3d {
+    background:  var(--dso-bezel) !important;
+    color:       var(--dso-amber) !important;
+    border:      1px solid rgba(212,160,82,0.3) !important;
+    box-shadow:  var(--neo-shadow), 0 0 8px rgba(212,160,82,0.15) !important;
+    font-family: 'DM Sans', monospace !important;
+  }
+
+  /* ── Footer → brand strip ─────────────────────────────────────── */
+  html.dark footer {
+    background:   linear-gradient(90deg, #272d36, #1e2229, #272d36) !important;
+    border-color: rgba(56,178,172,0.12) !important;
+    border-top:   1px solid rgba(56,178,172,0.15) !important;
+  }
+
+  /* ── Skeleton shimmer → LCD style ────────────────────────────── */
+  @keyframes lcdShimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+  html.dark .skeleton {
+    background:      linear-gradient(90deg, #1e2229 25%, #272d36 50%, #1e2229 75%) !important;
+    background-size: 200% 100% !important;
+    animation:       lcdShimmer 1.8s ease-in-out infinite !important;
+    border:          1px solid rgba(56,178,172,0.06) !important;
+  }
+
+  /* ── Scrollbar → teal DSO ─────────────────────────────────────── */
+  html.dark ::-webkit-scrollbar-track  { background: var(--dso-bg) !important; }
+  html.dark ::-webkit-scrollbar-thumb  {
+    background: rgba(56,178,172,0.3) !important;
+    border-radius: 3px !important;
+  }
+  html.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(56,178,172,0.55) !important;
+  }
+
+  /* ── Recharts → teal data viz ─────────────────────────────────── */
+  html.dark .recharts-cartesian-axis-tick-value {
+    fill: var(--dso-muted) !important;
+    font-family: 'DM Sans', monospace !important;
+    font-size: 10px !important;
+  }
+  html.dark .recharts-tooltip-cursor        { fill: rgba(56,178,172,0.06) !important; }
+  html.dark .recharts-default-tooltip {
+    background:   var(--dso-panel) !important;
+    border:       1px solid rgba(56,178,172,0.25) !important;
+    border-radius: 8px !important;
+    box-shadow:   var(--neo-shadow) !important;
+  }
+
+  /* ── Progress Tracker in dark ─────────────────────────────────── */
+  html.dark [role="navigation"] {
+    background:   var(--dso-panel) !important;
+    border:       1px solid rgba(56,178,172,0.15) !important;
+    box-shadow:   var(--neo-shadow) !important;
+  }
+
+  /* ── Selection ────────────────────────────────────────────────── */
+  html.dark ::selection {
+    background: rgba(56,178,172,0.3);
+    color:      var(--dso-text);
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     NUCLEAR OVERRIDES — Force ALL inline background colors dark
+     React components use inline style={{ background: '#F5F3F0' }}
+     which CSS classes can't normally override. These rules do.
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Force EVERY element's background dark in dark mode */
+  html.dark * {
+    scrollbar-color: rgba(56,178,172,0.3) var(--dso-bg);
+  }
+
+  /* ── UNIVERSAL BACKGROUND OVERRIDE ─────────────────────────────
+     Targets ALL element types, not just div/section
+     React renders hex as rgb() so we target both formats
+     ────────────────────────────────────────────────────────────── */
+
+  /* Force page-level wrappers dark */
+  html.dark body > #root > * {
+    background: var(--dso-bg) !important;
+  }
+
+  /* Catch EVERY element with a beige/white/light bg */
+  html.dark *[style*="rgb(245, 243, 240)"],
+  html.dark *[style*="rgb(245,243,240)"],
+  html.dark *[style*="rgb(255, 255, 255)"],
+  html.dark *[style*="rgb(249, 249, 249)"],
+  html.dark *[style*="rgb(237, 233, 227)"],
+  html.dark *[style*="rgb(242, 242, 242)"],
+  html.dark *[style*="#F5F3F0"],
+  html.dark *[style*="#FFFFFF"],
+  html.dark *[style*="#F9F9F9"],
+  html.dark *[style*="#EDE9E3"],
+  html.dark *[style*="#f5f3f0"],
+  html.dark *[style*="#ffffff"] {
+    background: #1e2229 !important;
+  }
+
+  /* Full-page wrapper divs */
+  html.dark *[style*="min-height: 100vh"],
+  html.dark *[style*="minHeight: 100vh"] {
+    background: var(--dso-bg) !important;
+  }
+
+  /* ── UNIVERSAL TEXT VISIBILITY ────────────────────────────────
+     Make ALL text readable in dark mode regardless of inline styles
+     ────────────────────────────────────────────────────────────── */
+
+  /* Headings → Teal blue (user's request: "make it blue") */
+  html.dark h1,
+  html.dark h2,
+  html.dark h3 {
+    color: #38b2ac !important;
+    text-shadow: 0 0 20px rgba(56,178,172,0.25) !important;
+  }
+
+  /* h4 and smaller → bright white-grey */
+  html.dark h4,
+  html.dark h5,
+  html.dark h6 {
+    color: #e8ecf1 !important;
+    text-shadow: none !important;
+  }
+
+  /* Paragraph and body text → bright readable grey */
+  html.dark p {
+    color: rgba(232,236,241,0.88) !important;
+  }
+
+  /* Span and general text — inherit unless specifically set */
+  html.dark li { color: rgba(232,236,241,0.82) !important; }
+
+  /* Override ANY inline navy color on text elements */
+  html.dark *[style*="color: rgb(11, 31, 61)"],
+  html.dark *[style*="color: rgb(11,31,61)"],
+  html.dark *[style*="#0B1F3D"],
+  html.dark *[style*="#0b1f3d"] {
+    color: #e8ecf1 !important;
+  }
+
+  /* Override muted text that goes invisible */
+  html.dark *[style*="color: rgb(107, 123, 141)"],
+  html.dark *[style*="color: rgb(138, 151, 166)"],
+  html.dark *[style*="color: rgb(100, 116, 139)"],
+  html.dark *[style*="#6B7B8D"],
+  html.dark *[style*="#8A97A6"],
+  html.dark *[style*="#6b7280"] {
+    color: rgba(232,236,241,0.6) !important;
+  }
+
+  /* Italic/em tags — keep gold accent */
+  html.dark em { color: #d4a052 !important; }
+
+
+  /* ── Neon Glow Button Effects ─────────────────────────────────── */
+  html.dark .btn-primary {
+    box-shadow:
+      var(--neo-shadow),
+      0 0 12px rgba(56,178,172,0.4),
+      0 4px 24px rgba(56,178,172,0.3),
+      0 8px 40px rgba(56,178,172,0.15) !important;
+  }
+  html.dark .btn-primary:hover {
+    box-shadow:
+      var(--neo-shadow),
+      0 0 20px rgba(56,178,172,0.6),
+      0 6px 32px rgba(56,178,172,0.4),
+      0 12px 50px rgba(56,178,172,0.2) !important;
+    transform: translateY(-2px) !important;
+  }
+  html.dark .btn-outline:hover {
+    box-shadow:
+      var(--neo-shadow),
+      0 0 14px rgba(56,178,172,0.35),
+      0 4px 20px rgba(56,178,172,0.2) !important;
+  }
+
+  /* Neon glow on icon circles */
+  html.dark .icon-3d-navy {
+    box-shadow:
+      var(--neo-shadow),
+      0 0 16px rgba(56,178,172,0.5),
+      0 4px 20px rgba(56,178,172,0.25) !important;
+  }
+
+  /* Fix inline dark overlays that go pure black */
+  html.dark div[style*="background: 'rgba(11,31,61"] {
+    background: rgba(56,178,172,0.06) !important;
+  }
+
+  /* Ensure all text on dark panels is readable */
+  html.dark .card * {
+    color: var(--dso-text);
+  }
+  html.dark .card p {
+    color: rgba(232,236,241,0.7) !important;
+  }
+  html.dark .card h1, html.dark .card h2,
+  html.dark .card h3, html.dark .card h4 {
+    color: var(--dso-text) !important;
+  }
+
+
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Times New Roman', Georgia, Times, serif;
     font-weight: 700;

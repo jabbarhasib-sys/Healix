@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
@@ -7,6 +8,9 @@ import SectionReveal from '../components/SectionReveal'
 import AnimatedCounter from '../components/AnimatedCounter'
 import useStore from '../store/useStore'
 import DNA3D from '../components/DNA3D'
+import OnboardingTutorial from '../components/OnboardingTutorial'
+import { useDarkMode } from '../hooks/useDarkMode'
+
 
 const STATS = [
   { end: 6,   suffix: '',   label: 'AI Modules' },
@@ -45,20 +49,36 @@ export default function Landing() {
   const { reset } = useStore()
   const handleStart = () => { reset(); navigate('/input') }
 
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try { return !localStorage.getItem('healix-onboarding-done') } catch { return false }
+  })
+  const handleOnboardingDone = () => {
+    try { localStorage.setItem('healix-onboarding-done', 'true') } catch {}
+    setShowOnboarding(false)
+  }
+
+  const [isDark] = useDarkMode()
+
   return (
-    <div style={{ background: '#F5F3F0', color: '#0B1F3D', fontFamily: F, overflowX: 'hidden' }}>
+    <div style={{ background: isDark ? '#1e2229' : '#F5F3F0', color: isDark ? '#e8ecf1' : '#0B1F3D', fontFamily: F, overflowX: 'hidden' }}>
       <Navbar />
+      {showOnboarding && <OnboardingTutorial onDone={handleOnboardingDone} />}
 
       {/* ═══ HERO ═══ */}
       <section style={{
         minHeight: '100vh', display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
         textAlign: 'center', padding: '120px 24px 80px', position: 'relative',
-        background: 'linear-gradient(180deg, #F5F3F0 0%, #EDE9E3 100%)',
+        overflow: 'visible',
+        background: isDark ? 'linear-gradient(180deg, #1e2229 0%, #141920 100%)' : 'linear-gradient(180deg, #F5F3F0 0%, #EDE9E3 100%)',
       }}>
         {/* Live 3D DNA Background */}
         <DNA3D />
 
-        <div style={{ maxWidth: 900, position: 'relative', zIndex: 1, paddingBottom: '40px', background: 'radial-gradient(circle, rgba(245,243,240,0.8) 0%, rgba(245,243,240,0) 70%)', padding: '60px' }}>
+        <div style={{
+          maxWidth: 900, position: 'relative', zIndex: 1, padding: '60px',
+          paddingBottom: '40px',
+          background: 'transparent',
+        }}>
           
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}

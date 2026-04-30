@@ -53,9 +53,13 @@ export default function HospitalCard({ hospital, rank, onClick }) {
 
       <div style={{ padding: '18px 18px 20px' }}>
         <h3 style={{ fontFamily: F, fontSize: 18, fontWeight: 700, color: '#0B1F3D', marginBottom: 4, lineHeight: 1.2 }}>{h.name}</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: h.address ? 6 : 14 }}>
           <span className="badge-gold" style={{ fontSize: 9, padding: '2px 8px' }}>{tierLabel}</span>
+          {h.osm_verified && <span style={{ fontSize: 9, color: '#2E7D32', fontFamily: FM, fontWeight: 700 }}>✅ OSM</span>}
         </div>
+        {h.address && (
+          <p style={{ fontSize: 11, color: '#6B7B8D', margin: '0 0 8px', lineHeight: 1.4, fontFamily: F }}>📍 {h.address}</p>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, fontSize: 13, color: '#6B7B8D', fontFamily: F }}>
           Primary: <strong style={{ color: '#0B1F3D', fontWeight: 700, marginLeft: 4 }}>{h.specialties?.[0] || 'General Medicine'}</strong>
         </div>

@@ -20,16 +20,17 @@ from db.database import init_db
 async def lifespan(app: FastAPI):
     # STARTUP
     setup_logger()
-    logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    logger.info("=" * 38)
     logger.info("  HEALIX AI Intelligence Engine")
     logger.info(f"  LLM  : {settings.active_llm.upper()} ({settings.ollama_model})")
     logger.info(f"  DB   : {settings.database_url[:30]}...")
     logger.info(f"  ENV  : {settings.app_env}")
-    logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    logger.info("=" * 38)
 
     # Init DB (creates tables if not exist)
     await init_db()
-    logger.info("Database initialized ✓")
+    logger.info("Database initialized OK")
+
 
     # Warm up Ollama connection check
     try:
@@ -38,7 +39,7 @@ async def lifespan(app: FastAPI):
             r = await client.get(f"{settings.ollama_base_url}/api/tags")
             if r.status_code == 200:
                 models = [m["name"] for m in r.json().get("models", [])]
-                logger.info(f"Ollama connected ✓ | models: {models}")
+                logger.info(f"Ollama connected OK | models: {models}")
             else:
                 logger.warning("Ollama reachable but returned non-200. Check model pull.")
     except Exception as e:

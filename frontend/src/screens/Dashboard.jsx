@@ -8,6 +8,8 @@ import GaugeChart from '../components/GaugeChart'
 import SeverityBadge from '../components/SeverityBadge'
 import SectionReveal from '../components/SectionReveal'
 import { MiniDNA } from '../components/DNA3D'
+import ProgressTracker from '../components/ProgressTracker'
+import { useDarkMode } from '../hooks/useDarkMode'
 
 const COLORS = ['#0B1F3D', '#2E4F78', '#5A769A', '#D4AF37', '#E8D48B']
 const TT = { background: '#0B1F3D', border: 'none', borderRadius: 10, fontSize: 11, color: '#F5F3F0', fontFamily: "'DM Mono', monospace" }
@@ -18,6 +20,7 @@ const FM = "'DM Mono', monospace"
 export default function Dashboard() {
   const navigate = useNavigate()
   const { result, reset } = useStore()
+  const [isDark] = useDarkMode()
 
   if (!result) return (
     <div style={{ minHeight: '100vh', background: '#F5F3F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: F }}>
@@ -46,7 +49,7 @@ export default function Dashboard() {
   const costEst = topCost?.estimate || 0
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: F, background: '#F5F3F0' }}>
+    <div style={{ minHeight: '100vh', fontFamily: F, background: isDark ? '#1e2229' : '#F5F3F0' }}>
       <Navbar />
 
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: '80px 24px 48px' }}>
@@ -151,7 +154,11 @@ export default function Dashboard() {
           </SectionReveal>
 
           <SectionReveal delay={0.2}>
-            <div className="card" style={{ padding: 28 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Progress Tracker */}
+              <ProgressTracker currentPath="/dashboard" />
+
+              <div className="card" style={{ padding: 28 }}>
               <div className="label" style={{ marginBottom: 24 }}>Recommendations</div>
               {[
                 { id: 'C', title: 'Consultation', desc: 'Secure appointment with a board-certified specialist.' },
@@ -159,13 +166,14 @@ export default function Dashboard() {
                 { id: 'T', title: 'Treatment', desc: 'Begin therapeutic intervention based on findings.' },
               ].map((r, i) => (
                 <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: i < 2 ? 20 : 0, paddingBottom: i < 2 ? 20 : 0, borderBottom: i < 2 ? '1px solid rgba(11,31,61,0.06)' : 'none' }}>
-                  <div className="icon-3d-navy" style={{ width: 36, height: 36, fontSize: 12, flexShrink: 0 }}>{r.id}</div>
-                  <div>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: '#0B1F3D', marginBottom: 4 }}>{r.title}</p>
-                    <p style={{ fontSize: 13, color: '#6B7B8D', lineHeight: 1.6, margin: 0 }}>{r.desc}</p>
+                    <div className="icon-3d-navy" style={{ width: 36, height: 36, fontSize: 12, flexShrink: 0 }}>{r.id}</div>
+                    <div>
+                      <p style={{ fontSize: 15, fontWeight: 700, color: '#0B1F3D', marginBottom: 4 }}>{r.title}</p>
+                      <p style={{ fontSize: 13, color: '#6B7B8D', lineHeight: 1.6, margin: 0 }}>{r.desc}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </SectionReveal>
         </div>

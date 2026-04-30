@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MiniDNA } from './DNA3D'
+import { useDarkMode } from '../hooks/useDarkMode'
 
 const NAV_LINKS = [
   { label: 'Home',          path: '/' },
@@ -19,6 +20,7 @@ export default function Navbar() {
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [dark, setDark] = useDarkMode()
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 30)
@@ -82,6 +84,22 @@ export default function Navbar() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Dark mode toggle */}
+          <motion.button
+            onClick={() => setDark(d => !d)}
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={dark ? 'Light mode' : 'Dark mode'}
+            style={{
+              width: 36, height: 36, borderRadius: '50%', border: 'none', cursor: 'pointer',
+              background: dark ? 'rgba(212,175,55,0.15)' : 'rgba(11,31,61,0.06)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 16, transition: 'background 0.25s',
+            }}
+          >
+            {dark ? '☀️' : '🌙'}
+          </motion.button>
+
           <motion.button onClick={() => navigate(cta.path)} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
             className="hide-mobile btn-primary"
             style={{ padding: '10px 24px', fontSize: 13 }}>{cta.label}</motion.button>

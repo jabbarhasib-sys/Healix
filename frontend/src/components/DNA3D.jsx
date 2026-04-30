@@ -124,7 +124,7 @@ export function MetallicDNA({ isVertical = false, color = '#E2E8F0' }) {
 export function MiniDNA({ color = '#1976D2' }) {
   return (
     <div style={{ width: 44, height: 44, pointerEvents: 'none' }}>
-      <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+      <Canvas gl={{ alpha: true, antialias: true }} camera={{ position: [0, 0, 15], fov: 45 }}>
         <Suspense fallback={null}>
           <ambientLight intensity={0.4} />
           <directionalLight position={[10, 20, 10]} intensity={2} color="#ffffff" />
@@ -143,7 +143,7 @@ export function MiniDNA({ color = '#1976D2' }) {
 export default function DNA3D() {
   return (
     <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, pointerEvents: 'none', zIndex: 0 }}>
-      <Canvas camera={{ position: [0, 0, 22], fov: 45 }}>
+      <Canvas gl={{ alpha: true, antialias: true }} camera={{ position: [0, 0, 22], fov: 45 }}>
         <Suspense fallback={null}>
           <ambientLight intensity={0.4} />
           <directionalLight position={[10, 20, 10]} intensity={2} color="#ffffff" />

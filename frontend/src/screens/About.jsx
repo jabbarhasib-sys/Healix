@@ -22,8 +22,7 @@ export default function About() {
             </h1>
             <p style={{ fontSize: 18, color: '#6B7B8D', maxWidth: 600, margin: '0 auto', lineHeight: 1.8 }}>
               HEALIX is a 6-module AI pipeline designed to democratize clinical reasoning.
-              Built for the National Hackathon 2026 by Intelligence Exchange.
-              By Team Neural Navigators.
+              Built by <strong style={{ color: '#0B1F3D' }}>Jabbar Hasib</strong>.
             </p>
           </div>
         </SectionReveal>
@@ -55,13 +54,16 @@ export default function About() {
       <section style={{ padding: '100px 24px', background: '#F5F3F0' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <SectionReveal>
-            <div className="label" style={{ marginBottom: 16 }}>The Team</div>
-            <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 32 }}>Intelligence Exchange</h2>
+            <div className="label" style={{ marginBottom: 16 }}>The Creator</div>
+            <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 32 }}>Jabbar Hasib</h2>
             <div className="card" style={{ padding: 48 }}>
-              <div style={{ fontSize: 22, fontWeight: 700, color: '#0B1F3D', marginBottom: 12 }}>National Hackathon 2026</div>
-              <p style={{ fontSize: 16, color: '#6B7B8D', lineHeight: 1.8 }}>
-                A specialized AI engineering collective focused on clinical reasoning systems, on-device LLM integration, and explainable intelligence.
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#0B1F3D', marginBottom: 12 }}>AI Engineer & Developer</div>
+              <p style={{ fontSize: 16, color: '#6B7B8D', lineHeight: 1.8, marginBottom: 16 }}>
+                Focused on clinical AI systems, on-device LLM integration, and explainable intelligence for real-world healthcare impact.
               </p>
+              <a href="mailto:jabbar.hasib@gmail.com" style={{ display: 'inline-block', fontSize: 15, fontWeight: 600, color: '#1976D2', textDecoration: 'none', background: 'rgba(25,118,210,0.08)', padding: '8px 16px', borderRadius: 20 }}>
+                jabbar.hasib@gmail.com
+              </a>
             </div>
           </SectionReveal>
         </div>
