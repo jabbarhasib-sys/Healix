@@ -14,9 +14,9 @@ class Settings(BaseSettings):
 
     # ── App ──────────────────────────────────────────────────────
     app_name: str = "HEALIX AI"
-    app_env: str = "development"
+    app_env: str = "production"
     app_port: int = 8000
-    debug: bool = True
+    debug: bool = False
     secret_key: str = "dev-secret-change-in-prod"
 
     # ── Ollama ───────────────────────────────────────────────────
@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
 
     # ── Database ─────────────────────────────────────────────────
-    database_url: str = "sqlite:///./healix.db"
+    database_url: str = "sqlite+aiosqlite:///./healix.db"
 
     # ── Redis ────────────────────────────────────────────────────
     redis_url: str = "redis://localhost:6379/0"

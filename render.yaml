@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: healix-backend
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./healix.db
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+    healthCheckPath: /api/health
