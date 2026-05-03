@@ -155,9 +155,9 @@ export default function ProcessingScreen() {
                   {/* Checklist */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[
-                      'Ensure Ollama is running: ollama serve',
-                      'Confirm model is pulled: ollama list',
-                      'Backend must be at: http://localhost:8000',
+                      'The AI backend may be starting up — please retry in a moment',
+                      'If the issue persists, try refreshing the page',
+                      'Ensure your symptoms are at least 10 characters long',
                     ].map((tip, i) => (
                       <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                         <div style={{ width: 20, height: 20, borderRadius: 4, background: '#0B1F3D', color: '#D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 10, fontWeight: 700 }}>

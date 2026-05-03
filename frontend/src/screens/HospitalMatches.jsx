@@ -11,6 +11,8 @@ import { MiniDNA } from '../components/DNA3D'
 
 const F  = "'Times New Roman', Georgia, serif"
 const FM = "'DM Mono', monospace"
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 
 export default function HospitalMatches() {
   const navigate = useNavigate()
@@ -42,7 +44,7 @@ export default function HospitalMatches() {
       setLoading(true)
       try {
         const res = await fetch(
-          `http://localhost:8000/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}`
+          `${API_BASE}/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}`
         )
         if (!res.ok) throw new Error('OSM fetch failed')
         const data = await res.json()

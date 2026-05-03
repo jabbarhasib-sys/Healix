@@ -9,6 +9,8 @@ import DNA3D from '../components/DNA3D'
 
 const F  = "'Times New Roman', Georgia, serif"
 const FM = "'DM Mono', monospace"
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 
 // ── City → real hospital data ─────────────────────────────────────────────────
 const CITY_HOSPITALS = {
@@ -164,7 +166,7 @@ export default function InputScreen() {
     const specialty = detectSpecialty()
     try {
       const res = await fetch(
-        `http://localhost:8000/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}`
+        `${API_BASE}/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}`
       )
       if (!res.ok) throw new Error('API key not configured')
       const data = await res.json()
@@ -445,7 +447,7 @@ export default function InputScreen() {
                       {/* Photo */}
                       <div style={{ position: 'relative', marginBottom: 10 }}>
                         <img
-                          src={h.photo_url ? `http://localhost:8000${h.photo_url}` : (i % 2 === 0 ? '/hospital_mockup_1_1777223441621.png' : '/hospital_mockup_2_1777223462644.png')}
+                          src={h.photo_url ? `${API_BASE}${h.photo_url}` : (i % 2 === 0 ? '/hospital_mockup_1_1777223441621.png' : '/hospital_mockup_2_1777223462644.png')}
                           alt={h.name}
                           onError={e => { e.target.src = '/hospital_mockup_1_1777223441621.png' }}
                           style={{ width: '100%', height: 110, objectFit: 'cover', borderRadius: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}

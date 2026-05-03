@@ -6,8 +6,8 @@ Dual-path: LLM (primary) with regex fallback.
 import re
 import json
 from core.logger import logger
-from inference import router as llm
-from inference.prompt_templates import SYSTEM_CLINICAL_PARSER, parse_patient_input
+# inference module removed — orchestrator handles LLM inline
+# keeping regex fallback path active
 
 
 _SYMPTOM_PATTERNS = [
@@ -82,17 +82,5 @@ async def run(raw_input: str) -> dict:
     if len(raw_input.strip()) < 10:
         raise ValueError("Input too short — at minimum describe your main symptom.")
 
-    try:
-        raw_json = await llm.complete(
-            prompt=parse_patient_input(raw_input),
-            system=SYSTEM_CLINICAL_PARSER,
-            temperature=0.1,
-            max_tokens=800,
-        )
-        parsed = json.loads(raw_json)
-        parsed["_source"] = "llm"
-        logger.debug(f"M1 parsed {len(parsed.get('symptoms', []))} symptoms via LLM")
-        return parsed
-    except Exception as e:
-        logger.warning(f"M1 LLM parse failed ({e}), using regex fallback")
-        return _regex_parse(raw_input)
+    # LLM path removed — use regex fallback directly
+    return _regex_parse(raw_input)

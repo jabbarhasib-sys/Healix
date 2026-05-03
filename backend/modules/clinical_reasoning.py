@@ -5,8 +5,7 @@ M2 — Probabilistic differential diagnosis via LLM + rule-based cross-check.
 import json
 import math
 from core.logger import logger
-from inference import router as llm
-from inference.prompt_templates import SYSTEM_CLINICAL_REASONER, differential_diagnosis
+# inference module removed — rule-based scoring used directly
 
 
 # Rule-based symptom cluster weights (used to validate/cross-check LLM output)
@@ -58,67 +57,44 @@ def _normalize_probabilities(conditions: list[dict]) -> list[dict]:
     return conditions
 
 
-async def run(parsed_input: dict) -> dict:
-    symptoms = parsed_input.get("symptoms", [])
-
-    # Rule-based scores as sanity check context
-    rule_scores = _rule_based_scores(symptoms)
-    context = f"Rule-based pre-scoring: {rule_scores}" if rule_scores else ""
-
-    try:
-        raw = await llm.complete(
-            prompt=differential_diagnosis(parsed_input, symptom_context=context),
-            system=SYSTEM_CLINICAL_REASONER,
-            temperature=0.2,
-            max_tokens=1800,
-        )
-        result = json.loads(raw)
-        result["conditions"] = _normalize_probabilities(result.get("conditions", []))
-
-        # Merge rule-based evidence into low-confidence LLM outputs
-        for cond in result["conditions"]:
-            if cond["probability"] < 0.15 and cond["name"] in rule_scores:
-                logger.debug(f"Rule boost applied to {cond['name']}")
-
-        logger.debug(
-            f"M2 → {len(result['conditions'])} conditions | "
-            f"urgency={result.get('overall_urgency')}"
-        )
-        return result
-
-    except Exception as e:
-        logger.error(f"M2 clinical reasoning failed: {e}")
-        # Structured fallback using rule-based scores only
-        fallback_conditions = [
-            {
-                "name": name,
-                "icd10_code": "R69",
-                "probability": prob,
-                "category": "other",
-                "urgency": "routine",
-                "recommended_specialty": "general_physician",
-                "supporting_symptoms": symptoms,
-                "against_symptoms": [],
-                "reasoning": f"Rule-based scoring on {len(symptoms)} symptoms.",
-            }
-            for name, prob in list(rule_scores.items())[:3]
-        ] or [{
-            "name": "Undifferentiated Illness",
+def _rule_based_fallback(symptoms: list[str], risk_flags: list[str], rule_scores: dict) -> dict:
+    fallback_conditions = [
+        {
+            "name": name,
             "icd10_code": "R69",
-            "probability": 1.0,
+            "probability": prob,
             "category": "other",
             "urgency": "routine",
-            "recommended_specialty": "general_physician",
+            "recommended_specialty": "General Medicine",
             "supporting_symptoms": symptoms,
             "against_symptoms": [],
-            "reasoning": "Insufficient data for specific diagnosis. Please provide more symptom detail.",
-        }]
-
-        return {
-            "conditions": fallback_conditions,
-            "overall_urgency": "routine",
-            "red_flags_identified": parsed_input.get("risk_flags", []),
-            "recommended_tests": ["Full blood count", "Metabolic panel", "Urine analysis"],
-            "reasoning_chain": ["LLM unavailable — rule-based fallback used"],
-            "clinical_summary": "Analysis based on symptom pattern matching. Consult a physician.",
+            "reasoning": f"Rule-based scoring on {len(symptoms)} symptoms.",
         }
+        for name, prob in list(rule_scores.items())[:3]
+    ] or [{
+        "name": "Undifferentiated Illness",
+        "icd10_code": "R69",
+        "probability": 1.0,
+        "category": "other",
+        "urgency": "routine",
+        "recommended_specialty": "General Medicine",
+        "supporting_symptoms": symptoms,
+        "against_symptoms": [],
+        "reasoning": "Insufficient data for specific diagnosis. Please provide more symptom detail.",
+    }]
+
+    return {
+        "conditions": fallback_conditions,
+        "overall_urgency": "routine",
+        "red_flags_identified": risk_flags,
+        "recommended_tests": ["Full blood count", "Metabolic panel", "Urine analysis"],
+        "reasoning_chain": ["Rule-based scoring used — no LLM available"],
+        "clinical_summary": "Analysis based on symptom pattern matching. Consult a physician.",
+    }
+
+
+async def run(parsed_input: dict) -> dict:
+    symptoms = parsed_input.get("symptoms", [])
+    rule_scores = _rule_based_scores(symptoms)
+    # LLM path removed — use rule-based fallback directly
+    return _rule_based_fallback(symptoms, parsed_input.get("risk_flags", []), rule_scores)

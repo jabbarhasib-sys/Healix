@@ -5,8 +5,7 @@ LLM + structured fallback.
 """
 import json
 from core.logger import logger
-from inference import router as llm
-from inference.prompt_templates import SYSTEM_EXPLAINER, explain_decision
+# inference module removed — structured fallback used directly
 
 
 async def run(
@@ -17,21 +16,8 @@ async def run(
 ) -> dict:
     top_hospital = ranked_hospitals[0] if ranked_hospitals else {}
     top_cost = top_hospital.get("cost_estimate", cost_data)
-
-    try:
-        raw = await llm.complete(
-            prompt=explain_decision(conditions, top_hospital, top_cost, confidence),
-            system=SYSTEM_EXPLAINER,
-            temperature=0.35,
-            max_tokens=1200,
-        )
-        result = json.loads(raw)
-        result["_source"] = "llm"
-        return result
-
-    except Exception as e:
-        logger.warning(f"M6 explainability LLM failed ({e}), using structured fallback")
-        return _structured_fallback(conditions, top_hospital, top_cost, confidence)
+    # LLM path removed — use structured fallback directly
+    return _structured_fallback(conditions, top_hospital, top_cost, confidence)
 
 
 def _structured_fallback(
