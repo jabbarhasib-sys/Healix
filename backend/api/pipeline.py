@@ -32,4 +32,5 @@ async def run(req: PipelineRequest, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
         logger.exception(f"Pipeline failed: {e}")
-        raise HTTPException(status_code=500, detail="Pipeline execution failed")
+        import traceback
+        raise HTTPException(status_code=500, detail=f"Pipeline error: {type(e).__name__}: {e}\n{traceback.format_exc()}")
