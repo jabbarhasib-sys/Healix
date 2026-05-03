@@ -861,6 +861,198 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 2px rgba(212,175,55,0.3), 0 2px 8px rgba(212,175,55,0.1);
 }
 
-/* ── Responsive ──────────────────────────────────────────────────── */
+/* ── Responsive — Mobile First ───────────────────────────────────────── */
+
+/* Utility visibility helpers */
 @media (max-width: 768px) { .hide-mobile { display: none !important; } }
 @media (min-width: 769px) { .hide-desktop { display: none !important; } }
+
+/* ─── Global mobile fixes ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Safe area for notched phones */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Reduce navbar padding on small screens */
+  nav {
+    padding: 0 16px !important;
+    height: 56px !important;
+  }
+
+  /* Collapse ALL grids to single column on mobile */
+  *[style*="grid-template-columns"],
+  *[style*="gridTemplateColumns"] {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Card padding reduction */
+  .card { padding: 16px !important; }
+  .card-cream { padding: 16px !important; }
+  .panel-3d { padding: 16px !important; border-radius: 14px !important; }
+
+  /* Buttons full-width on mobile */
+  .btn-primary, .btn-outline, .btn-gold {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Container padding */
+  .container { padding: 0 16px !important; }
+  .section-padded { padding: 64px 16px !important; }
+}
+
+/* ─── Navbar subtitle — hide on very small screens ─────────────────────── */
+@media (max-width: 380px) {
+  nav span[style*="fontSize: 9"] { display: none !important; }
+}
+
+/* ─── Landing / Welcome screens ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Hero heading sizes */
+  h1 { font-size: clamp(28px, 8vw, 48px) !important; }
+  h2 { font-size: clamp(22px, 6vw, 36px) !important; }
+  h3 { font-size: clamp(18px, 5vw, 28px) !important; }
+
+  /* Prevent fixed-width containers from overflowing */
+  div[style*="maxWidth"],
+  div[style*="max-width"] {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Stack horizontal flex rows on mobile */
+  div[style*="display: flex"][style*="gap"] {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* ─── Input Screen specific ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* The 2-column "input + sidebar" layout collapses to 1 column */
+  div[style*="grid-template-columns: 1fr 340px"],
+  div[style*="gridTemplateColumns: '1fr 340px'"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+
+  /* Patient info row: name / age / gender → vertical stack */
+  div[style*="grid-template-columns: 1fr 80px 120px"],
+  div[style*="gridTemplateColumns: '1fr 80px 120px'"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* Example buttons: 2-col → 1-col */
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Sidebar becomes full width */
+  div[style*="minHeight: 480"] {
+    min-height: auto !important;
+  }
+}
+
+/* ─── Processing Screen ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Stage cards grid → single column */
+  div[style*="grid-template-columns: repeat(auto-fit, minmax(240px"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Error card buttons — stack vertically */
+  div[style*="display: 'flex'"][style*="gap: 12"] {
+    flex-direction: column !important;
+  }
+}
+
+/* ─── Dashboard screen ───────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Dashboard main grid → stack */
+  div[style*="grid-template-columns: 1fr 1fr"],
+  div[style*="grid-template-columns: repeat(2"],
+  div[style*="grid-template-columns: repeat(3"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+}
+
+/* ─── Hospital Matches ───────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  div[style*="grid-template-columns: repeat(auto-fill, minmax(340px"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  footer div[style*="grid-template-columns"],
+  footer div[style*="gridTemplateColumns"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+  }
+
+  footer { padding: 40px 20px !important; }
+}
+
+/* ─── Inline padding/margin overrides for small screens ──────────────────── */
+@media (max-width: 768px) {
+  /* Reduce heavy top padding */
+  div[style*="padding: '140px"] { padding-top: 80px !important; }
+  div[style*="padding: '120px"] { padding-top: 80px !important; }
+  div[style*="padding: '100px"] { padding-top: 80px !important; }
+
+  div[style*="paddingTop: 140"] { padding-top: 80px !important; }
+  div[style*="paddingTop: 120"] { padding-top: 80px !important; }
+  div[style*="paddingTop: 100"] { padding-top: 80px !important; }
+
+  /* Side padding — prevent content touching edges */
+  div[style*="padding: '"] {
+    padding-left: max(16px, env(safe-area-inset-left)) !important;
+    padding-right: max(16px, env(safe-area-inset-right)) !important;
+  }
+
+  /* Prevent any element from exceeding viewport width */
+  * { max-width: 100vw !important; }
+  img, video, canvas, svg { max-width: 100% !important; height: auto !important; }
+}
+
+/* ─── Touch targets — minimum 44px hit area on mobile ────────────────────── */
+@media (max-width: 768px) {
+  button { min-height: 44px !important; }
+  select { min-height: 44px !important; font-size: 16px !important; } /* prevents iOS zoom */
+  input  { min-height: 44px !important; font-size: 16px !important; } /* prevents iOS zoom */
+  textarea { font-size: 16px !important; }                             /* prevents iOS zoom */
+}
+
+/* ─── Tablet tweaks (768px - 1024px) ─────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  nav { padding: 0 24px !important; }
+
+  div[style*="grid-template-columns: 1fr 340px"],
+  div[style*="gridTemplateColumns: '1fr 340px'"] {
+    display: grid !important;
+    grid-template-columns: 1fr 280px !important;
+  }
+}
