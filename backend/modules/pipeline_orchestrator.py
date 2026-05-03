@@ -306,97 +306,103 @@ async def run_pipeline(
         if on_stage:
             await on_stage(key, label)
 
-    try:
-        async with asyncio.timeout(settings.pipeline_timeout):
+    async def _execute_pipeline():
+        nonlocal profile, parsed, clinical, risk, ranked, weights, confidence, explanation
 
-            # Classify symptoms accurately
-            profile = _classify_symptoms(raw_input)
+        # Classify symptoms accurately
+        profile = _classify_symptoms(raw_input)
 
-            # M1 — Parsing
-            await stage("parsing")
-            await asyncio.sleep(0.35)
-            parsed = {
-                "age": None, "gender": "unknown",
-                "symptoms": [raw_input[:60]],
-                "duration": "recent", "severity": profile["severity"],
-                "budget_inr": None, "_source": "demo_cache"
-            }
+        # M1 — Parsing
+        await stage("parsing")
+        await asyncio.sleep(0.35)
+        parsed = {
+            "age": None, "gender": "unknown",
+            "symptoms": [raw_input[:60]],
+            "duration": "recent", "severity": profile["severity"],
+            "budget_inr": None, "_source": "demo_cache"
+        }
 
-            # M2 — Clinical Reasoning
-            await stage("reasoning")
-            await asyncio.sleep(0.35)
-            clinical = {
-                "conditions": profile["conditions"],
-                "red_flags_identified": profile["red_flags"],
-                "reasoning_chain": profile["chain"],
-                "recommended_tests": profile["tests"],
-                "clinical_summary": profile["summary"],
-            }
+        # M2 — Clinical Reasoning
+        await stage("reasoning")
+        await asyncio.sleep(0.35)
+        clinical = {
+            "conditions": profile["conditions"],
+            "red_flags_identified": profile["red_flags"],
+            "reasoning_chain": profile["chain"],
+            "recommended_tests": profile["tests"],
+            "clinical_summary": profile["summary"],
+        }
 
-            # Risk Engine
-            await stage("risk")
-            risk = {
-                "is_emergency": profile["is_emergency"],
-                "urgency_level": profile["urgency"],
-                "emergency_reasons": profile["red_flags"],
-                "recommended_action": "Seek immediate emergency care." if profile["is_emergency"] else "Schedule a consultation.",
-            }
+        # Risk Engine
+        await stage("risk")
+        risk = {
+            "is_emergency": profile["is_emergency"],
+            "urgency_level": profile["urgency"],
+            "emergency_reasons": profile["red_flags"],
+            "recommended_action": "Seek immediate emergency care." if profile["is_emergency"] else "Schedule a consultation.",
+        }
 
-            # Fetch hospitals from DB
-            await stage("ranking")
-            async with SessionLocal() as db:
-                hospitals_raw = await get_hospitals(
-                    db,
-                    er_only=risk["is_emergency"],
-                    specialties=[profile["specialty"]],
-                    limit=50,
-                )
-                hospitals_dicts = [h.to_dict() for h in hospitals_raw]
+        # Fetch hospitals from DB
+        await stage("ranking")
+        async with SessionLocal() as db:
+            hospitals_raw = await get_hospitals(
+                db,
+                er_only=risk["is_emergency"],
+                specialties=[profile["specialty"]],
+                limit=50,
+            )
+            hospitals_dicts = [h.to_dict() for h in hospitals_raw]
 
-            if not hospitals_dicts:
-                logger.warning("DB empty — using specialty-matched demo hospitals")
-                hospitals_dicts = _demo_hospitals(profile["specialty"], profile["is_emergency"])
+        if not hospitals_dicts:
+            logger.warning("DB empty — using specialty-matched demo hospitals")
+            hospitals_dicts = _demo_hospitals(profile["specialty"], profile["is_emergency"])
 
-            ranked, weights = decision_engine.rank(
-                hospitals=hospitals_dicts,
-                conditions=clinical.get("conditions", []),
+        ranked, weights = decision_engine.rank(
+            hospitals=hospitals_dicts,
+            conditions=clinical.get("conditions", []),
+            urgency=risk["urgency_level"],
+            budget_inr=parsed.get("budget_inr"),
+        )
+
+        # M4 — Cost Model
+        await stage("costing")
+        for h in ranked[:settings.max_hospitals]:
+            h["cost_estimate"] = cost_model.estimate(
+                hospital=h,
+                severity=parsed.get("severity", "moderate"),
                 urgency=risk["urgency_level"],
-                budget_inr=parsed.get("budget_inr"),
             )
 
-            # M4 — Cost Model
-            await stage("costing")
-            for h in ranked[:settings.max_hospitals]:
-                h["cost_estimate"] = cost_model.estimate(
-                    hospital=h,
-                    severity=parsed.get("severity", "moderate"),
-                    urgency=risk["urgency_level"],
-                )
+        # M5 — Confidence
+        await stage("confidence")
+        confidence = {
+            "score": 0.88 if profile["is_emergency"] else 0.74,
+            "percentage": 88.0 if profile["is_emergency"] else 74.0,
+            "tier": "high" if profile["is_emergency"] else "moderate",
+            "components": {"data_reliability": 0.85, "model_agreement": 0.88, "input_clarity": 0.85},
+            "warnings": [],
+            "interpretation": "High confidence — symptoms match clinical profile." if profile["is_emergency"] else "Moderate confidence — further evaluation recommended.",
+        }
 
-            # M5 — Confidence
-            await stage("confidence")
-            confidence = {
-                "score": 0.88 if profile["is_emergency"] else 0.74,
-                "percentage": 88.0 if profile["is_emergency"] else 74.0,
-                "tier": "high" if profile["is_emergency"] else "moderate",
-                "components": {"data_reliability": 0.85, "model_agreement": 0.88, "input_clarity": 0.85},
-                "warnings": [],
-                "interpretation": "High confidence — symptoms match clinical profile." if profile["is_emergency"] else "Moderate confidence — further evaluation recommended.",
-            }
+        # M6 — Explainability
+        await stage("explaining")
+        await asyncio.sleep(0.35)
+        explanation = {
+            "patient_summary": profile["patient_msg"],
+            "clinical_rationale": profile["rationale"],
+            "cost_rationale": "Estimates based on the recommended specialty's standard diagnostic protocol.",
+        }
 
-            # M6 — Explainability
-            await stage("explaining")
-            await asyncio.sleep(0.35)
-            explanation = {
-                "patient_summary": profile["patient_msg"],
-                "clinical_rationale": profile["rationale"],
-                "cost_rationale": "Estimates based on the recommended specialty's standard diagnostic protocol.",
-            }
+        await stage("complete")
 
-            await stage("complete")
+    # Mutable containers so the inner coroutine can assign to them
+    profile = parsed = clinical = risk = ranked = weights = confidence = explanation = None
 
+    try:
+        await asyncio.wait_for(_execute_pipeline(), timeout=settings.pipeline_timeout)
     except asyncio.TimeoutError:
         raise PipelineTimeoutError()
+
 
     duration_ms = round((time.monotonic() - t_start) * 1000)
 
