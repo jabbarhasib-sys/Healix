@@ -17,10 +17,10 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 export default function HospitalMatches() {
   const navigate = useNavigate()
   const { result, location } = useStore()
-  const [filters, setFilters]         = useState({})
+  const [filters, setFilters]           = useState({})
   const [osmHospitals, setOsmHospitals] = useState([])
-  const [loading, setLoading]          = useState(false)
-  const [source, setSource]            = useState('pipeline') // 'osm' | 'pipeline'
+  const [loading, setLoading]           = useState(false)
+  const [source, setSource]             = useState('pipeline')
 
   if (!result) return (
     <div style={{ minHeight: '100vh', background: '#F5F3F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: F }}>
@@ -32,47 +32,51 @@ export default function HospitalMatches() {
     </div>
   )
 
-  const { hospitals: pipelineHospitals = [], clinical = {}, confidence } = result
-  const top     = clinical?.conditions?.[0]
-  const confPct = Math.round((confidence?.percentage || 0))
+  const { hospitals: pipelineHospitals = [], clinical = {}, confidence, risk = {} } = result
+  const top       = clinical?.conditions?.[0]
+  const confPct   = Math.round((confidence?.percentage || 0))
   const specialty = top?.recommended_specialty || 'General Medicine'
   const city      = location?.city || 'Bangalore'
+  const userLat   = location?.lat
+  const userLng   = location?.lng
+  const isEmergency = risk?.is_emergency || false
 
-  // Fetch real hospitals from OSM on mount
+  // Nearest ER hospital for emergency banner
+  const nearestER = osmHospitals.find(h => h.er_capable) || osmHospitals[0]
+
   useEffect(() => {
     const fetchOSM = async () => {
       setLoading(true)
       try {
-        const res = await fetch(
-          `${API_BASE}/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}`
-        )
+        // Build URL — use exact coords if available (5km radius), else city center (8km)
+        let url = `${API_BASE}/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}&radius=5000`
+        if (userLat && userLng) url += `&lat=${userLat}&lng=${userLng}`
+
+        const res = await fetch(url)
         if (!res.ok) throw new Error('OSM fetch failed')
         const data = await res.json()
 
         if (data.hospitals && data.hospitals.length > 0) {
-          // Merge OSM real-world data with pipeline cost estimates
           const merged = data.hospitals.map((h, i) => {
             const pipelineH = pipelineHospitals[i] || pipelineHospitals[0] || {}
             return {
-              // Real fields from OSM
-              id:            h.name.replace(/\s+/g, '-').toLowerCase() + '-' + i,
-              name:          h.name,
-              city:          city,
-              address:       h.address,
-              distance_km:   h.distance_km,
-              emergency:     h.emergency,
-              phone:         h.phone,
-              website:       h.website,
-              maps_url:      h.maps_url,
-              // Meaningful fields from pipeline (scoring, cost, specialty)
-              score:         pipelineH.score         || (0.95 - i * 0.05),
-              specialties:   pipelineH.specialties   || [specialty],
-              tier:          pipelineH.tier          || 'super_specialty',
-              cost_estimate: pipelineH.cost_estimate || null,
-              wait_time_mins:pipelineH.wait_time_mins|| Math.round(10 + i * 4),
-              er_capable:    h.emergency || pipelineH.er_capable || false,
-              rating:        h.rating,
-              osm_verified:  true,
+              id:             h.name.replace(/\s+/g, '-').toLowerCase() + '-' + i,
+              name:           h.name,
+              city:           city,
+              address:        h.address,
+              distance_km:    h.distance_km,
+              emergency:      h.emergency,
+              er_capable:     h.emergency || pipelineH.er_capable || false,
+              phone:          h.phone,
+              website:        h.website,
+              maps_url:       h.maps_url,
+              score:          pipelineH.score         || (0.95 - i * 0.05),
+              specialties:    pipelineH.specialties   || [specialty],
+              tier:           pipelineH.tier          || 'general',
+              cost_estimate:  pipelineH.cost_estimate || null,
+              wait_time_mins: pipelineH.wait_time_mins|| Math.round(10 + i * 4),
+              rating:         h.rating,
+              osm_verified:   true,
             }
           })
           setOsmHospitals(merged)
@@ -85,7 +89,7 @@ export default function HospitalMatches() {
       setLoading(false)
     }
     fetchOSM()
-  }, [city, specialty])
+  }, [city, specialty, userLat, userLng])
 
   const displayHospitals = source === 'osm' && osmHospitals.length > 0
     ? osmHospitals
@@ -97,6 +101,53 @@ export default function HospitalMatches() {
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px 64px' }}>
 
+        {/* ── EMERGENCY BANNER ───────────────────────────── */}
+        {isEmergency && (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              background: 'linear-gradient(135deg, #C62828, #B71C1C)',
+              borderRadius: 16,
+              padding: '20px 28px',
+              marginBottom: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 16,
+              boxShadow: '0 4px 24px rgba(198,40,40,0.35)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <span style={{ fontSize: 36 }}>🚨</span>
+              <div>
+                <p style={{ color: '#fff', fontWeight: 700, fontSize: 18, margin: 0, fontFamily: F }}>
+                  Emergency Detected — Go to Nearest ER Immediately
+                </p>
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, margin: '4px 0 0', fontFamily: FM }}>
+                  {nearestER
+                    ? `Nearest hospital: ${nearestER.name} (${nearestER.distance_km} km away)`
+                    : 'Call 112 or go to the nearest emergency room now'}
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <a href="tel:112"
+                style={{ background: '#fff', color: '#C62828', padding: '10px 20px', borderRadius: 10, fontWeight: 700, fontFamily: FM, fontSize: 13, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                📞 Call 112
+              </a>
+              {nearestER?.maps_url && (
+                <a href={nearestER.maps_url} target="_blank" rel="noopener noreferrer"
+                  style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', padding: '10px 20px', borderRadius: 10, fontWeight: 700, fontFamily: FM, fontSize: 13, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
+                  🗺 Navigate to ER →
+                </a>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── HEADER ──────────────────────────────────────── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48, flexWrap: 'wrap', gap: 24 }}>
           <SectionReveal>
             <div className="label" style={{ marginBottom: 12 }}>Matched Facilities</div>
@@ -104,20 +155,21 @@ export default function HospitalMatches() {
               {city} Medical<br />
               <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#D4AF37' }}>Network.</em>
             </h1>
-            {/* Source badge */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
               <span style={{ fontFamily: FM, fontSize: 10, color: source === 'osm' ? '#2E7D32' : '#B8962E',
                 background: source === 'osm' ? 'rgba(46,125,50,0.1)' : 'rgba(184,150,46,0.1)',
                 padding: '3px 10px', borderRadius: 20, fontWeight: 700 }}>
-                {loading ? '⏳ Fetching real hospitals...' : source === 'osm' ? '✅ Live OpenStreetMap Data' : '📋 Curated Hospital Data'}
+                {loading ? '⏳ Finding hospitals near you...' : source === 'osm' ? '✅ Real Hospitals — Live Data' : '📋 Curated Hospital Data'}
               </span>
-              <span style={{ fontFamily: FM, fontSize: 10, color: '#6B7B8D' }}>📍 {city}</span>
+              <span style={{ fontFamily: FM, fontSize: 10, color: '#6B7B8D' }}>
+                📍 {userLat && userLng ? 'Your exact location' : city} · within 5 km
+              </span>
             </div>
           </SectionReveal>
 
           {top && (
             <SectionReveal delay={0.15}>
-              <div className="card" style={{ padding: '24px 32px', minWidth: 320 }}>
+              <div className="card" style={{ padding: '24px 32px', minWidth: 280 }}>
                 <div className="data-label" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span>Case Synthesis</span>
                   <div style={{ transform: 'scale(0.7)', margin: '-20px -20px -20px 0', opacity: 0.8 }}><MiniDNA /></div>
@@ -146,7 +198,7 @@ export default function HospitalMatches() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid rgba(11,31,61,0.1)', borderTopColor: '#0B1F3D', animation: 'spin 0.7s linear infinite', margin: '0 auto 16px' }} />
-            <p style={{ fontFamily: FM, fontSize: 13, color: '#6B7B8D' }}>Searching real hospitals in {city}...</p>
+            <p style={{ fontFamily: FM, fontSize: 13, color: '#6B7B8D' }}>Searching hospitals within 5 km of your location...</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24, marginBottom: 56 }}>
