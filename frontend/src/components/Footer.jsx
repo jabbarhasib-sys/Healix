@@ -9,7 +9,6 @@ const LINKS = [
     { label: 'How It Works', path: '/how-it-works' },
     { label: 'AI Technology', path: '/technology' },
     { label: 'Why HEALIX', path: '/why-healix' },
-    { label: 'Impact & Results', path: '/impact' },
   ]},
   { heading: 'Trust', items: [
     { label: 'Security', path: '/security' },
@@ -53,29 +52,7 @@ export default function Footer() {
             </div>
           ))}
 
-          {/* Compliance — redesigned, no boxy badges */}
-          <div>
-            <p style={{ fontFamily: FM, fontSize: 10, fontWeight: 600, letterSpacing: 2.5, textTransform: 'uppercase', color: '#D4AF37', marginBottom: 16 }}>Compliance</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {[
-                { code: 'HIPAA', full: 'Health Insurance Portability' },
-                { code: 'SOC 2', full: 'Service Organization Control' },
-                { code: 'GDPR', full: 'Data Protection Regulation' },
-                { code: 'HITRUST', full: 'Health Information Trust' },
-              ].map(b => (
-                <div key={b.code} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{
-                    width: 6, height: 6, borderRadius: '50%', background: '#D4AF37', flexShrink: 0,
-                    boxShadow: '0 0 6px rgba(212,175,55,0.4)',
-                  }} />
-                  <div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#F5F3F0', fontFamily: F }}>{b.code}</span>
-                    <span style={{ fontSize: 11, color: 'rgba(245,243,240,0.3)', marginLeft: 8, fontFamily: F }}>{b.full}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+
         </div>
 
         <div style={{ height: 1, background: 'rgba(245,243,240,0.06)', marginBottom: 24 }} />

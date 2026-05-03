@@ -291,6 +291,9 @@ def _demo_hospitals(specialty: str, er_only: bool) -> list:
 async def run_pipeline(
     raw_input: str,
     session_id: str | None = None,
+    patient_name: str | None = None,
+    patient_age: int | None = None,
+    patient_gender: str | None = None,
     on_stage: Callable[[str, str], Awaitable[None]] | None = None,
 ) -> dict:
     run_id = str(uuid.uuid4())
@@ -400,6 +403,9 @@ async def run_pipeline(
     result = {
         "run_id": run_id,
         "session_id": session_id,
+        "patient_name": patient_name,
+        "patient_age": patient_age,
+        "patient_gender": patient_gender,
         "parsed_input": parsed,
         "clinical": clinical,
         "risk": risk,
@@ -424,6 +430,9 @@ async def _log_to_db(result: dict, raw_input: str, duration_ms: int):
             await log_pipeline_run(db, {
                 "id": result["run_id"],
                 "session_id": result["session_id"],
+                "patient_name": result.get("patient_name"),
+                "patient_age": result.get("patient_age"),
+                "patient_gender": result.get("patient_gender"),
                 "raw_input": raw_input,
                 "parsed_input": result["parsed_input"],
                 "conditions_output": result["clinical"],
@@ -437,3 +446,17 @@ async def _log_to_db(result: dict, raw_input: str, duration_ms: int):
             })
     except Exception as e:
         logger.error(f"DB log failed (non-fatal): {e}")
+
+    # ── LOG TO TEXT FILE (Requested Format) ──────────────────────────
+    try:
+        log_entry = (
+            f"name : {result.get('patient_name') or 'N/A'}\n"
+            f"age : {result.get('patient_age') or 'N/A'}\n"
+            f"gender : {result.get('patient_gender') or 'N/A'}\n"
+            f"symptom : {raw_input}\n"
+            f"{'-'*40}\n"
+        )
+        with open("assessments.txt", "a", encoding="utf-8") as f:
+            f.write(log_entry)
+    except Exception as e:
+        logger.error(f"Text file log failed: {e}")

@@ -14,6 +14,9 @@ class PipelineRequest(BaseModel):
     )
     session_id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
     city: Optional[str] = Field(None, description="City for hospital search")
+    patient_name: Optional[str] = Field(None, description="Patient name")
+    patient_age: Optional[int] = Field(None, description="Patient age")
+    patient_gender: Optional[str] = Field(None, description="Patient gender")
 
     @field_validator("symptoms_text")
     @classmethod

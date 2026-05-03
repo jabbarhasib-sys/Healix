@@ -19,6 +19,9 @@ async def run(req: PipelineRequest, db: AsyncSession = Depends(get_db)):
         result = await run_pipeline(
             raw_input=req.symptoms_text,
             session_id=req.session_id,
+            patient_name=req.patient_name,
+            patient_age=req.patient_age,
+            patient_gender=req.patient_gender,
         )
         logger.info(
             f"Pipeline OK | {round((time.monotonic()-t)*1000)}ms | "

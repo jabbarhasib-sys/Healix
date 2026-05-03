@@ -17,6 +17,9 @@ async def ws_pipeline(ws: WebSocket):
         data = await ws.receive_json()
         symptoms_text = data.get("symptoms_text", "").strip()
         session_id = data.get("session_id")
+        patient_name = data.get("patient_name")
+        patient_age = data.get("patient_age")
+        patient_gender = data.get("patient_gender")
 
         if not symptoms_text:
             await ws.send_json({"type": "error", "message": "symptoms_text required"})
@@ -31,6 +34,9 @@ async def ws_pipeline(ws: WebSocket):
         result = await run_pipeline(
             raw_input=symptoms_text,
             session_id=session_id,
+            patient_name=patient_name,
+            patient_age=patient_age,
+            patient_gender=patient_gender,
             on_stage=on_stage,
         )
 

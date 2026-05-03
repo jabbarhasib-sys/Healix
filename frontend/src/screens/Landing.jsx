@@ -19,26 +19,10 @@ const STATS = [
   { end: 3,   prefix: '<',  suffix: 's', label: 'Analysis Time' },
 ]
 
-const MODULES = [
-  { id: 'M1', name: 'Input Understanding',  color: '#5A769A', desc: 'LLM + regex dual-path parser. Extracts symptoms, duration, severity, budget from natural language.' },
-  { id: 'M2', name: 'Clinical Reasoning',   color: '#2E4F78', desc: 'Probabilistic differential diagnosis with rule-weighted symptom scoring.' },
-  { id: 'M3', name: 'Decision Engine',      color: '#0B1F3D', desc: 'Dynamic multi-factor hospital ranking. Emergency = distance first.' },
-  { id: 'M4', name: 'Cost Intelligence',    color: '#D4AF37', desc: 'Stochastic estimation: Base × Tier × Location × Risk with min/max ranges.' },
-  { id: 'M5', name: 'Confidence Engine',    color: '#B8962E', desc: 'Cubic root fusion of data reliability, model agreement, and input clarity.' },
-  { id: 'M6', name: 'Explainability',       color: '#7C641E', desc: 'Every output traced. WHY this condition. WHY this hospital. HOW cost was derived.' },
-]
-
 const STEPS = [
   { n: '01', title: 'Describe', sub: 'Type your symptoms naturally — AI handles the rest' },
   { n: '02', title: 'Analyse',  sub: '6 AI modules run in sequence, streaming live results' },
   { n: '03', title: 'Decide',   sub: 'Get ranked hospitals, cost estimates, full reasoning' },
-]
-
-const DEMOS = [
-  { tag: 'CARDIAC', severity: 'critical', text: 'Severe chest pain radiating to left arm, sweating, breathlessness for 2 hours.' },
-  { tag: 'INFECTIOUS', severity: 'urgent', text: 'Fever of 103°F for 3 days with severe body ache and headache. Budget ₹50,000.' },
-  { tag: 'NEUROLOGICAL', severity: 'critical', text: 'Sudden worst headache of my life with neck stiffness since this morning.' },
-  { tag: 'MUSCULOSKELETAL', severity: 'routine', text: 'Both knee joints swollen, morning stiffness over 1 hour for 3 weeks.' },
 ]
 
 const F = "'Times New Roman', Georgia, serif"
@@ -119,7 +103,7 @@ export default function Landing() {
               style={{ padding: '16px 48px', fontSize: 16, background: '#0B1F3D', color: '#FFFFFF', border: 'none', fontWeight: 700, borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Begin Assessment
             </motion.button>
-            <motion.button onClick={() => document.getElementById('pipeline')?.scrollIntoView({ behavior: 'smooth' })}
+            <motion.button onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
               className="btn-outline" whileHover={{ scale: 1.02 }}
               style={{ padding: '16px 32px', fontSize: 15, color: '#0B1F3D', borderColor: 'rgba(11,31,61,0.2)', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', background: 'transparent' }}>
               Explore Platform
@@ -129,7 +113,7 @@ export default function Landing() {
       </section>
 
       {/* ═══ WHAT IS HEALIX ═══ */}
-      <section style={{ padding: '100px 24px', background: '#FFFFFF' }}>
+      <section style={{ padding: '100px 24px', background: '#F5F3F0' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
             <SectionReveal>
@@ -167,38 +151,10 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ═══ PIPELINE ═══ */}
-      <section id="pipeline" style={{ padding: '100px 24px', background: '#F5F3F0' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <SectionReveal style={{ textAlign: 'center', marginBottom: 60 }}>
-            <div className="label" style={{ marginBottom: 14 }}>The Pipeline</div>
-            <h2 style={{ fontSize: 'clamp(30px,4vw,50px)', fontWeight: 700, letterSpacing: -1, lineHeight: 1.1, fontFamily: F }}>
-              Six modules.<br /><span style={{ color: '#6B7B8D', fontWeight: 400, fontSize: '0.65em' }}>One intelligent chain.</span>
-            </h2>
-          </SectionReveal>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {MODULES.map((m, i) => (
-              <SectionReveal key={m.id} delay={i * 0.06}>
-                <div className="card" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 20, alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div className="icon-3d-navy" style={{ width: 48, height: 48, fontSize: 14, flexShrink: 0 }}>{m.id}</div>
-                    <div>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: m.color, fontFamily: FM, display: 'block' }}>MODULE {i + 1}</span>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: '#0B1F3D', fontFamily: F }}>{m.name}</span>
-                    </div>
-                  </div>
-                  <p style={{ fontSize: 14, color: '#6B7B8D', lineHeight: 1.75, margin: 0, fontFamily: F }}>{m.desc}</p>
-                  <div style={{ width: 3, height: 40, borderRadius: 2, background: `linear-gradient(180deg,${m.color},${m.color}40)`, flexShrink: 0 }} />
-                </div>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section style={{ padding: '100px 24px', background: '#FFFFFF' }}>
+      <section id="how-it-works" style={{ padding: '100px 24px', background: '#F5F3F0' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <SectionReveal style={{ textAlign: 'center', marginBottom: 64 }}>
             <div className="label" style={{ marginBottom: 14 }}>How It Works</div>
@@ -221,35 +177,10 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ═══ DEMO SCENARIOS ═══ */}
-      <section style={{ padding: '100px 24px', background: '#F5F3F0' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <SectionReveal style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div className="label" style={{ marginBottom: 14 }}>Try These</div>
-            <h2 style={{ fontSize: 'clamp(26px,3.5vw,44px)', fontWeight: 700, letterSpacing: -1, fontFamily: F }}>Live demo scenarios</h2>
-          </SectionReveal>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {DEMOS.map((s, i) => {
-              const sevColors = { critical: { bg: '#FFF5F5', text: '#C62828' }, urgent: { bg: '#FFFBEB', text: '#E65100' }, routine: { bg: '#F0FFF4', text: '#2E7D32' } }
-              const sc = sevColors[s.severity] || sevColors.routine
-              return (
-                <SectionReveal key={s.tag} delay={i * 0.08}>
-                  <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer', padding: '18px 22px' }}
-                    onClick={() => navigate('/input')}>
-                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.5, color: sc.text, fontFamily: FM, flexShrink: 0, minWidth: 120, background: sc.bg, padding: '4px 10px', borderRadius: 6 }}>{s.tag}</span>
-                    <p style={{ fontSize: 15, color: '#6B7B8D', margin: 0, lineHeight: 1.6, flex: 1, fontFamily: F }}>{s.text}</p>
-                    <span style={{ color: '#D4AF37', flexShrink: 0, fontSize: 18, fontWeight: 700 }}>→</span>
-                  </div>
-                </SectionReveal>
-              )
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <section style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 24px', background: '#FFFFFF' }}>
+      <section style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 24px', background: '#F5F3F0' }}>
         <SectionReveal>
           <div className="gold-accent-line" style={{ margin: '0 auto 24px' }} />
           <div className="label" style={{ marginBottom: 20 }}>Ready</div>

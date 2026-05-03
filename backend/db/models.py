@@ -89,6 +89,10 @@ class PipelineRun(Base):
     cost_output: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     confidence_output: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
+    patient_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    patient_age: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    patient_gender: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+
     llm_backend_used: Mapped[str] = mapped_column(String(50), default="ollama")
     duration_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     success: Mapped[bool] = mapped_column(Boolean, default=True)

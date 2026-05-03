@@ -1,0 +1,25 @@
+HEALIX ASSESSMENT LOGS
+======================
+This file stores your clinical assessments in human-readable format.
+Each new assessment will be appended below.
+
+name : jabbar
+age : 25
+gender : male
+symptom : Severe chest pain radiating to my left arm for the last 2 hours.
+----------------------------------------
+name : jabbar
+age : 25
+gender : male
+symptom : Severe chest pain radiating to my left arm for the last 2 hours.
+----------------------------------------
+name : hasib
+age : 23
+gender : male
+symptom : Worst headache of my life with sudden neck stiffness.
+----------------------------------------
+name : hasib
+age : 23
+gender : male
+symptom : Worst headache of my life with sudden neck stiffness.
+----------------------------------------

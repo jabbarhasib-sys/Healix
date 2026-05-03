@@ -24,6 +24,7 @@ export default function ProcessingScreen() {
   const navigate = useNavigate()
   const {
     symptomsText, sessionId,
+    patientName, patientAge, patientGender,
     pipelineStage, completedStages,
     setResult, setPipelineStage, resetPipeline, setError,
   } = useStore()
@@ -50,6 +51,9 @@ export default function ProcessingScreen() {
     const cleanup = streamPipeline({
       symptomsText,
       sessionId,
+      patientName,
+      patientAge,
+      patientGender,
       onStage: (stageId, label) => setPipelineStage(stageId, label),
       onResult: (data) => {
         clearInterval(ticker)

@@ -8,8 +8,7 @@ const NAV_LINKS = [
   { label: 'Home',          path: '/' },
   { label: 'Services',      path: '/how-it-works' },
   { label: 'Philosophy',    path: '/why-healix' },
-  { label: 'Intelligence',  path: '/technology' },
-  { label: 'Concierge',     path: '/impact' },
+  { label: 'Philosophy',    path: '/why-healix' },
 ]
 
 const F = "'Times New Roman', Georgia, serif"
