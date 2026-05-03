@@ -78,16 +78,21 @@ async def get_nearby_hospitals(
     city:      str = Query(..., description="City name e.g. Mumbai"),
     specialty: str = Query("General Medicine", description="Medical specialty"),
     radius:    int = Query(8000, description="Search radius in metres"),
+    lat:       float = Query(None, description="Exact latitude"),
+    lng:       float = Query(None, description="Exact longitude"),
 ):
     """
-    Returns real hospitals near the city using OpenStreetMap data.
-    Completely free — no API key or billing required.
+    Returns real hospitals near the user. If lat/lng are provided, searches 
+    around exact coordinates. Otherwise, geocodes the city center.
     """
-    # 1. Geocode city
-    lat, lng = await _geocode(city)
+    # 1. Determine center point (User coords OR City center)
+    if lat is not None and lng is not None:
+        actual_lat, actual_lng = lat, lng
+    else:
+        actual_lat, actual_lng = await _geocode(city)
 
     # 2. Fetch hospitals from Overpass
-    elements = await _find_hospitals(lat, lng, radius)
+    elements = await _find_hospitals(actual_lat, actual_lng, radius)
 
     # 3. Filter & enrich
     keywords = _SPECIALTY_TAGS.get(specialty, [])
@@ -99,14 +104,12 @@ async def get_nearby_hospitals(
         if not name:
             continue
 
-        # For specialty-specific queries, try to prefer matching hospitals
-        # (but don't exclude others — just sort them later)
         specialty_match = not keywords or any(k in name.lower() for k in keywords)
 
-        el_lat = el.get("lat") or el.get("center", {}).get("lat", lat)
-        el_lon = el.get("lon") or el.get("center", {}).get("lon", lng)
+        el_lat = el.get("lat") or el.get("center", {}).get("lat", actual_lat)
+        el_lon = el.get("lon") or el.get("center", {}).get("lon", actual_lng)
 
-        dist = _haversine_km(lat, lng, float(el_lat), float(el_lon))
+        dist = _haversine_km(actual_lat, actual_lng, float(el_lat), float(el_lon))
 
         hospitals.append({
             "name":               name,
@@ -115,9 +118,9 @@ async def get_nearby_hospitals(
                 tags.get("addr:street"),
                 tags.get("addr:suburb") or tags.get("addr:city") or city,
             ])) or city,
-            "rating":             None,    # OSM doesn't have ratings
+            "rating":             None,
             "user_ratings_total": None,
-            "photo_url":          None,    # OSM doesn't have photos
+            "photo_url":          None,
             "maps_url":           _maps_url(float(el_lat), float(el_lon), name),
             "open_now":           None,
             "distance_km":        dist,
@@ -128,7 +131,7 @@ async def get_nearby_hospitals(
         })
 
     if not hospitals:
-        raise HTTPException(status_code=404, detail=f"No hospitals found in {city} within {radius}m.")
+        raise HTTPException(status_code=404, detail=f"No hospitals found near you.")
 
     # Sort: specialty matches first, then by distance
     hospitals.sort(key=lambda h: (not h["specialty_match"], h["distance_km"]))
@@ -136,8 +139,8 @@ async def get_nearby_hospitals(
     return {
         "city":      city,
         "specialty": specialty,
-        "lat":       lat,
-        "lng":       lng,
+        "lat":       actual_lat,
+        "lng":       actual_lng,
         "source":    "OpenStreetMap (free)",
         "hospitals": hospitals[:8],
     }

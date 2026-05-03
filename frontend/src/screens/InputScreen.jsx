@@ -161,13 +161,14 @@ export default function InputScreen() {
     }))
   }
 
-  const searchHospitalsForCity = async (city) => {
-    setLocation({ city, lat: 0, lng: 0 })
+  const searchHospitalsForCity = async (city, lat, lng) => {
+    setLocation({ city, lat: lat || 0, lng: lng || 0 })
     const specialty = detectSpecialty()
     try {
-      const res = await fetch(
-        `${API_BASE}/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}`
-      )
+      let url = `${API_BASE}/api/places/hospitals?city=${encodeURIComponent(city)}&specialty=${encodeURIComponent(specialty)}`
+      if (lat && lng) url += `&lat=${lat}&lng=${lng}`
+      
+      const res = await fetch(url)
       if (!res.ok) throw new Error('API key not configured')
       const data = await res.json()
       if (data.hospitals && data.hospitals.length > 0) {
@@ -198,9 +199,9 @@ export default function InputScreen() {
     setLocationMode('auto')
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        const { latitude, longitude } = pos.coords
         try {
           // Reverse geocode using nominatim (free, no key needed)
-          const { latitude, longitude } = pos.coords
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
           )
@@ -209,10 +210,10 @@ export default function InputScreen() {
           const matched = GEO_CITY_MAP[raw] || SUPPORTED_CITIES.find(c => raw.includes(c.toLowerCase()))
           const city = matched || 'Bangalore' // fallback
           setSelectedCity(city)
-          searchHospitalsForCity(city)
+          searchHospitalsForCity(city, latitude, longitude)
         } catch {
           setSelectedCity('Bangalore')
-          searchHospitalsForCity('Bangalore')
+          searchHospitalsForCity('Bangalore', latitude, longitude)
         }
         setIsLocating(false)
       },
