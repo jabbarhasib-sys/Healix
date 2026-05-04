@@ -4,28 +4,34 @@ from sqlalchemy.orm import DeclarativeBase
 from core.config import settings
 from core.logger import logger
 
-# Normalize DB URL
+# Normalize DB URL — handle all variants Render can inject
 _url = settings.database_url
 
 if _url.startswith("sqlite"):
+    # Local dev — SQLite with aiosqlite async driver
     _url = _url.replace("sqlite:///", "sqlite+aiosqlite:///")
+    engine = create_async_engine(_url, echo=settings.debug)
 
-    # ✅ SQLite engine (NO pooling args)
-    engine = create_async_engine(
-        _url,
-        echo=settings.debug,
-    )
-
-elif _url.startswith("postgresql://"):
-    _url = _url.replace("postgresql://", "postgresql+asyncpg://")
-
-    # ✅ PostgreSQL engine (WITH pooling)
+elif _url.startswith("postgres://") or _url.startswith("postgresql://"):
+    # Render PostgreSQL — swap to asyncpg driver
+    _url = _url.replace("postgres://", "postgresql+asyncpg://", 1)
+    _url = _url.replace("postgresql://", "postgresql+asyncpg://", 1)
     engine = create_async_engine(
         _url,
         echo=settings.debug,
         pool_pre_ping=True,
-        pool_size=10,
-        max_overflow=20,
+        pool_size=5,
+        max_overflow=10,
+    )
+
+elif _url.startswith("postgresql+asyncpg://"):
+    # Already normalized
+    engine = create_async_engine(
+        _url,
+        echo=settings.debug,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
     )
 
 else:

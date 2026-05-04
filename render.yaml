@@ -13,7 +13,14 @@ services:
       - key: DEBUG
         value: "false"
       - key: DATABASE_URL
-        value: sqlite+aiosqlite:///./healix.db
+        fromDatabase:
+          name: healix-db
+          property: connectionString
       - key: PYTHON_VERSION
         value: "3.11.9"
     healthCheckPath: /api/health
+
+databases:
+  - name: healix-db
+    plan: free
+    region: singapore
