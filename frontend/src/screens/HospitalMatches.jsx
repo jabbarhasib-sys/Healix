@@ -207,7 +207,11 @@ export default function HospitalMatches() {
                 key={h.id || i}
                 hospital={h}
                 rank={i + 1}
-                onClick={() => h.maps_url && window.open(h.maps_url, '_blank')}
+                onClick={() => {
+                  const url = h.maps_url
+                    || `https://www.google.com/maps/search/${encodeURIComponent((h.name || '') + ' ' + (h.city || city) + ' hospital')}`
+                  window.open(url, '_blank', 'noopener,noreferrer')
+                }}
               />
             ))}
           </div>

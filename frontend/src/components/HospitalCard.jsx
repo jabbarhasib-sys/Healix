@@ -88,6 +88,17 @@ export default function HospitalCard({ hospital, rank, onClick }) {
             </div>
           </div>
         )}
+
+        {/* Maps CTA */}
+        <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(11,31,61,0.06)' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            fontFamily: FM, fontSize: 11, fontWeight: 700,
+            color: '#1976D2', letterSpacing: 0.5,
+          }}>
+            🗺 View on Google Maps →
+          </div>
+        </div>
       </div>
     </motion.div>
   )
