@@ -22,6 +22,7 @@ elif _url.startswith("postgres://") or _url.startswith("postgresql://"):
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=10,
+        connect_args={"ssl": "require"},
     )
 
 elif _url.startswith("postgresql+asyncpg://"):
@@ -32,6 +33,7 @@ elif _url.startswith("postgresql+asyncpg://"):
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=10,
+        connect_args={"ssl": "require"},
     )
 
 else:
