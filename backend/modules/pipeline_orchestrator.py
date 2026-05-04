@@ -314,7 +314,6 @@ async def run_pipeline(
 
         # M1 — Parsing
         await stage("parsing")
-        await asyncio.sleep(0.35)
         parsed = {
             "age": None, "gender": "unknown",
             "symptoms": [raw_input[:60]],
@@ -324,7 +323,6 @@ async def run_pipeline(
 
         # M2 — Clinical Reasoning
         await stage("reasoning")
-        await asyncio.sleep(0.35)
         clinical = {
             "conditions": profile["conditions"],
             "red_flags_identified": profile["red_flags"],
@@ -386,7 +384,6 @@ async def run_pipeline(
 
         # M6 — Explainability
         await stage("explaining")
-        await asyncio.sleep(0.35)
         explanation = {
             "patient_summary": profile["patient_msg"],
             "clinical_rationale": profile["rationale"],

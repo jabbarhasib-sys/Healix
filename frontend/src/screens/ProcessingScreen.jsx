@@ -45,7 +45,7 @@ export default function ProcessingScreen() {
       tick = Math.min(tick + 1, STAGES.length - 1)
       setVisualStage(tick)
       setPipelineStage(STAGES[tick].id, STAGES[tick].label)
-    }, 2200)
+    }, 700)
 
     // ── Real backend call ──
     const cleanup = streamPipeline({
