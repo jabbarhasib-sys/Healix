@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const isProd = import.meta.env.PROD
+const API_BASE = import.meta.env.VITE_API_URL || (isProd ? 'https://healix-026p.onrender.com' : 'http://localhost:8000')
 
 export default function AdminDashboard() {
   const [runs, setRuns] = useState([])
