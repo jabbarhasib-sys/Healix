@@ -1,3 +1,8 @@
+databases:
+  - name: healix-db
+    region: singapore
+    plan: free
+
 services:
   - type: web
     name: healix-backend
@@ -13,7 +18,9 @@ services:
       - key: DEBUG
         value: "false"
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: healix-db
+          property: connectionString
       - key: PYTHON_VERSION
         value: "3.11.9"
     healthCheckPath: /api/health

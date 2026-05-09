@@ -16,6 +16,7 @@ const AITechnology      = lazy(() => import('./screens/AITechnology'))
 const WhyHealix         = lazy(() => import('./screens/WhyHealix'))
 const SecurityCompliance = lazy(() => import('./screens/SecurityCompliance'))
 const ImpactResults     = lazy(() => import('./screens/ImpactResults'))
+const AdminDashboard    = lazy(() => import('./screens/AdminDashboard'))
 
 function Loader() {
   return (
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/why-healix"      element={<WhyHealix />} />
           <Route path="/security"        element={<SecurityCompliance />} />
           <Route path="/impact"          element={<ImpactResults />} />
+          <Route path="/admin"           element={<AdminDashboard />} />
         </Routes>
       </AnimatePresence>
     </Suspense>
