@@ -447,6 +447,7 @@ async def _log_to_db(result: dict, raw_input: str, duration_ms: int):
                 "success": True,
                 "is_emergency": result["risk"]["is_emergency"],
             })
+            await db.commit()
     except Exception as e:
         logger.error(f"DB log failed (non-fatal): {e}")
 
