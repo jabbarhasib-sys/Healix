@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import useStore from '../store/useStore'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -16,6 +17,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export default function HospitalMatches() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { result, location } = useStore()
   const [filters, setFilters]           = useState({})
   const [osmHospitals, setOsmHospitals] = useState([])
@@ -26,8 +28,8 @@ export default function HospitalMatches() {
     <div style={{ minHeight: '100vh', background: '#F5F3F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: F }}>
       <Navbar />
       <div style={{ textAlign: 'center' }}>
-        <p style={{ color: '#6B7B8D', marginBottom: 16 }}>No analysis found. Run an assessment first.</p>
-        <button onClick={() => navigate('/input')} className="btn-primary">Begin Assessment</button>
+        <p style={{ color: '#6B7B8D', marginBottom: 16 }}>{t('hospitals.noAnalysis')}</p>
+        <button onClick={() => navigate('/input')} className="btn-primary">{t('hospitals.beginAssessment')}</button>
       </div>
     </div>
   )
@@ -123,24 +125,24 @@ export default function HospitalMatches() {
               <span style={{ fontSize: 36 }}>🚨</span>
               <div>
                 <p style={{ color: '#fff', fontWeight: 700, fontSize: 18, margin: 0, fontFamily: F }}>
-                  Emergency Detected — Go to Nearest ER Immediately
+                  {t('hospitals.emergency')}
                 </p>
                 <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, margin: '4px 0 0', fontFamily: FM }}>
                   {nearestER
-                    ? `Nearest hospital: ${nearestER.name} (${nearestER.distance_km} km away)`
-                    : 'Call 112 or go to the nearest emergency room now'}
+                    ? `${t('hospitals.nearestHospital')}: ${nearestER.name} (${nearestER.distance_km} ${t('hospitals.awayKm')})`
+                    : t('hospitals.callEmergency')}
                 </p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <a href="tel:112"
                 style={{ background: '#fff', color: '#C62828', padding: '10px 20px', borderRadius: 10, fontWeight: 700, fontFamily: FM, fontSize: 13, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                📞 Call 112
+                {t('hospitals.call112')}
               </a>
               {nearestER?.maps_url && (
                 <a href={nearestER.maps_url} target="_blank" rel="noopener noreferrer"
                   style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', padding: '10px 20px', borderRadius: 10, fontWeight: 700, fontFamily: FM, fontSize: 13, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
-                  🗺 Navigate to ER →
+                  {t('hospitals.navigateER')}
                 </a>
               )}
             </div>
@@ -150,19 +152,19 @@ export default function HospitalMatches() {
         {/* ── HEADER ──────────────────────────────────────── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48, flexWrap: 'wrap', gap: 24 }}>
           <SectionReveal>
-            <div className="label" style={{ marginBottom: 12 }}>Matched Facilities</div>
+            <div className="label" style={{ marginBottom: 12 }}>{t('hospitals.matchedFacilities')}</div>
             <h1 style={{ fontSize: 'clamp(32px,5vw,52px)', fontWeight: 700, letterSpacing: -1.5, lineHeight: 1.05, color: '#0B1F3D', fontFamily: F }}>
-              {city} Medical<br />
+              {city} {t('hospitals.medicalNetwork')}
               <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#D4AF37' }}>Network.</em>
             </h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
               <span style={{ fontFamily: FM, fontSize: 10, color: source === 'osm' ? '#2E7D32' : '#B8962E',
                 background: source === 'osm' ? 'rgba(46,125,50,0.1)' : 'rgba(184,150,46,0.1)',
                 padding: '3px 10px', borderRadius: 20, fontWeight: 700 }}>
-                {loading ? '⏳ Finding hospitals near you...' : source === 'osm' ? '✅ Real Hospitals — Live Data' : '📋 Curated Hospital Data'}
+                {loading ? t('hospitals.findingNear') : source === 'osm' ? t('hospitals.realHospitals') : t('hospitals.curatedData')}
               </span>
               <span style={{ fontFamily: FM, fontSize: 10, color: '#6B7B8D' }}>
-                📍 {userLat && userLng ? 'Your exact location' : city} · within 5 km
+                📍 {userLat && userLng ? t('hospitals.exactLocation') : city} · {t('hospitals.within5km')}
               </span>
             </div>
           </SectionReveal>
@@ -171,7 +173,7 @@ export default function HospitalMatches() {
             <SectionReveal delay={0.15}>
               <div className="card" style={{ padding: '24px 32px', minWidth: 280 }}>
                 <div className="data-label" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>Case Synthesis</span>
+                  <span>{t('hospitals.caseSynthesis')}</span>
                   <div style={{ transform: 'scale(0.7)', margin: '-20px -20px -20px 0', opacity: 0.8 }}><MiniDNA /></div>
                 </div>
                 <p style={{ fontSize: 20, fontWeight: 700, color: '#0B1F3D', marginBottom: 6, fontFamily: F }}>{top.name}</p>
@@ -179,7 +181,7 @@ export default function HospitalMatches() {
                   <div style={{ width: 100, height: 4, background: 'rgba(11,31,61,0.06)', borderRadius: 2 }}>
                     <div style={{ width: `${confPct}%`, height: '100%', background: '#D4AF37', borderRadius: 2 }} />
                   </div>
-                  <span style={{ fontFamily: FM, fontSize: 11, color: '#6B7B8D' }}>{confPct}% Confidence</span>
+                  <span style={{ fontFamily: FM, fontSize: 11, color: '#6B7B8D' }}>{confPct}% {t('hospitals.confidence')}</span>
                 </div>
                 <span style={{ fontFamily: FM, fontSize: 10, color: '#1976D2', background: 'rgba(25,118,210,0.08)', padding: '2px 8px', borderRadius: 10 }}>
                   {specialty}
@@ -198,7 +200,7 @@ export default function HospitalMatches() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid rgba(11,31,61,0.1)', borderTopColor: '#0B1F3D', animation: 'spin 0.7s linear infinite', margin: '0 auto 16px' }} />
-            <p style={{ fontFamily: FM, fontSize: 13, color: '#6B7B8D' }}>Searching hospitals within 5 km of your location...</p>
+            <p style={{ fontFamily: FM, fontSize: 13, color: '#6B7B8D' }}>{t('hospitals.searching')}</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24, marginBottom: 56 }}>
@@ -221,10 +223,10 @@ export default function HospitalMatches() {
           <motion.button onClick={() => navigate('/cost-analysis')} className="btn-primary"
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
             style={{ padding: '16px 48px', fontSize: 16, marginRight: 16 }}>
-            Financial Transparency →
+            {t('hospitals.financialBtn')}
           </motion.button>
           <button onClick={() => navigate('/dashboard')} className="btn-outline" style={{ padding: '16px 32px', fontSize: 15 }}>
-            ← Intelligence Results
+            {t('hospitals.backToResults')}
           </button>
         </div>
 

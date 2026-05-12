@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import DNA3D from '../components/DNA3D'
@@ -9,6 +10,7 @@ const FM = "'DM Mono', monospace"
 
 export default function Welcome() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5F3F0', fontFamily: F, display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden' }}>
@@ -31,7 +33,7 @@ export default function Welcome() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-            <div className="label" style={{ marginBottom: 24 }}>Enrollment Complete</div>
+            <div className="label" style={{ marginBottom: 24 }}>{t('welcome.enrollmentComplete')}</div>
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -41,8 +43,8 @@ export default function Welcome() {
               letterSpacing: -2, lineHeight: 0.95, color: '#0B1F3D',
               marginBottom: 24,
             }}>
-            Access<br />
-            <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#D4AF37' }}>Confirmed.</em>
+            {t('welcome.accessConfirmed')}<br />
+            <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#D4AF37' }}>{t('welcome.confirmed')}</em>
           </motion.h1>
 
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
@@ -50,7 +52,7 @@ export default function Welcome() {
               fontSize: 18, color: '#6B7B8D', maxWidth: 520,
               margin: '0 auto 48px', lineHeight: 1.8, fontWeight: 400,
             }}>
-            Your HEALIX Concierge membership is active. You have transitioned to the pinnacle of data-driven clinical intelligence.
+            {t('welcome.membershipDesc')}
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
@@ -59,10 +61,10 @@ export default function Welcome() {
             <motion.button onClick={() => navigate('/dashboard')} className="btn-primary"
               whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
               style={{ padding: '18px 56px', fontSize: 16 }}>
-              Dashboard
+              {t('welcome.dashboard')}
             </motion.button>
             <button onClick={() => navigate('/')} className="btn-outline" style={{ padding: '18px 32px', fontSize: 16 }}>
-              Home
+              {t('welcome.home')}
             </button>
           </motion.div>
 
@@ -72,9 +74,9 @@ export default function Welcome() {
               gap: 24, maxWidth: 600, margin: '72px auto 0',
             }}>
             {[
-              { label: 'Access Level', value: 'Concierge' },
-              { label: 'AI Status',    value: 'Verified' },
-              { label: 'Priority',     value: 'Platinum' },
+              { label: t('welcome.accessLevel'), value: t('welcome.accessValue') },
+              { label: t('welcome.aiStatus'),    value: t('welcome.aiValue') },
+              { label: t('welcome.priority'),     value: t('welcome.priorityValue') },
             ].map(item => (
               <div key={item.label} style={{ textAlign: 'center' }}>
                 <div className="data-label" style={{ marginBottom: 8 }}>{item.label}</div>

@@ -1,27 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import useStore from '../store/useStore'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { streamPipeline } from '../services/api'
-import DNA3D from '../components/DNA3D'
 import { useDarkMode } from '../hooks/useDarkMode'
 
 const F = "'Times New Roman', Georgia, serif"
 const FM = "'DM Mono', monospace"
 
-const STAGES = [
-  { id: 'PARSING',   label: 'Parsing Clinical Entities',  detail: 'NLP extraction from natural language' },
-  { id: 'REASONING', label: 'Clinical Reasoning',         detail: 'Probabilistic differential synthesis' },
-  { id: 'RISK',      label: 'Risk Assessment',            detail: 'Severity and urgency calibration' },
-  { id: 'RANKING',   label: 'Facility Ranking',           detail: 'Multi-factor hospital matching' },
-  { id: 'COST',      label: 'Cost Estimation',            detail: 'Stochastic financial modeling' },
-  { id: 'EXPLAIN',   label: 'Synthesizing Explanation',   detail: 'Generating reasoning traces' },
+const STAGE_KEYS = [
+  { id: 'PARSING',   labelKey: 'processing.stage_parsing',   detailKey: 'processing.detail_parsing' },
+  { id: 'REASONING', labelKey: 'processing.stage_reasoning', detailKey: 'processing.detail_reasoning' },
+  { id: 'RISK',      labelKey: 'processing.stage_risk',      detailKey: 'processing.detail_risk' },
+  { id: 'RANKING',   labelKey: 'processing.stage_ranking',   detailKey: 'processing.detail_ranking' },
+  { id: 'COST',      labelKey: 'processing.stage_costing',   detailKey: 'processing.detail_costing' },
+  { id: 'EXPLAIN',   labelKey: 'processing.stage_explain',   detailKey: 'processing.detail_explain' },
 ]
 
 export default function ProcessingScreen() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
+  const STAGES = STAGE_KEYS.map(s => ({ ...s, label: t(s.labelKey), detail: t(s.detailKey) }))
   const {
     symptomsText, sessionId,
     patientName, patientAge, patientGender,
@@ -81,20 +83,19 @@ export default function ProcessingScreen() {
 
   return (
     <div style={{ minHeight: '100vh', background: isDark ? '#1e2229' : '#F5F3F0', fontFamily: F, position: 'relative', overflowX: 'hidden' }}>
-      <DNA3D />
       <Navbar />
 
-      <div style={{ maxWidth: 820, margin: '0 auto', padding: '140px 24px 80px', position: 'relative', zIndex: 1, background: 'radial-gradient(circle, rgba(245,243,240,0.85) 0%, rgba(245,243,240,0) 80%)' }}>
+      <div style={{ maxWidth: 820, margin: '0 auto', padding: '140px 24px 80px', position: 'relative', zIndex: 1 }}>
 
         {/* ── Header ── */}
         <div style={{ textAlign: 'center', marginBottom: 56 }}>
           <div className="label" style={{ marginBottom: 16 }}>
-            {errorMsg ? 'Pipeline Halted' : 'Pipeline in Progress'}
+          {errorMsg ? t('processing.halted') : t('processing.subtitle')}
           </div>
           <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 700, color: '#0B1F3D', marginBottom: 20, letterSpacing: -0.5 }}>
             {errorMsg
-              ? <>Analysis <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#C62828' }}>Interrupted</em></>
-              : <>Processing Clinical <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#D4AF37' }}>Intelligence</em></>
+              ? <>{t('processing.interrupted')} <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#C62828' }}></em></>
+              : <>{t('processing.title').split('Clinical')[0]}Clinical <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#D4AF37' }}>Intelligence</em></>
             }
           </h1>
 
@@ -139,10 +140,10 @@ export default function ProcessingScreen() {
                 </div>
                 <div>
                   <h3 style={{ fontSize: 20, fontWeight: 700, color: '#C62828', marginBottom: 8 }}>
-                    Backend Pipeline Error
+                    {t('processing.errorTitle')}
                   </h3>
                   <p style={{ fontSize: 14, color: '#6B7B8D', lineHeight: 1.7, marginBottom: 16 }}>
-                    The analysis pipeline could not complete. This is usually caused by the AI model not being available.
+                    {t('processing.errorDesc')}
                   </p>
                   {/* Technical detail */}
                   <div style={{
@@ -155,9 +156,9 @@ export default function ProcessingScreen() {
                   {/* Checklist */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[
-                      'The AI backend may be starting up — please retry in a moment',
-                      'If the issue persists, try refreshing the page',
-                      'Ensure your symptoms are at least 10 characters long',
+                      t('processing.tip1'),
+                      t('processing.tip2'),
+                      t('processing.tip3'),
                     ].map((tip, i) => (
                       <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                         <div style={{ width: 20, height: 20, borderRadius: 4, background: '#0B1F3D', color: '#D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 10, fontWeight: 700 }}>
@@ -175,14 +176,14 @@ export default function ProcessingScreen() {
                   className="btn-primary"
                   style={{ padding: '12px 28px', fontSize: 14 }}
                 >
-                  Retry Analysis
+                  {t('processing.retryBtn')}
                 </button>
                 <button
                   onClick={() => navigate('/input')}
                   className="btn-outline"
                   style={{ padding: '12px 24px', fontSize: 14 }}
                 >
-                  Edit Symptoms
+                  {t('processing.editBtn')}
                 </button>
               </div>
             </motion.div>
@@ -229,7 +230,7 @@ export default function ProcessingScreen() {
 
         {!errorMsg && (
           <p style={{ textAlign: 'center', fontFamily: FM, fontSize: 10, color: 'rgba(11,31,61,0.2)', letterSpacing: 1.5, marginTop: 40 }}>
-            HEALIX AI · DO NOT CLOSE THIS WINDOW
+          HEALIX AI · {t('processing.doNotClose').replace('HEALIX AI · ', '')}
           </p>
         )}
       </div>

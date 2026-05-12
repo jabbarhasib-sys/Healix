@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { MiniDNA } from './DNA3D'
 import { useDarkMode } from '../hooks/useDarkMode'
+import LanguageSelector from './LanguageSelector'
 
-const NAV_LINKS = [
-  { label: 'Home',          path: '/' },
-  { label: 'Services',      path: '/how-it-works' },
-  { label: 'Philosophy',    path: '/why-healix' },
-  { label: 'Philosophy',    path: '/why-healix' },
+const NAV_LINKS_KEYS = [
+  { labelKey: 'nav.home',       path: '/' },
+  { labelKey: 'nav.howItWorks', path: '/how-it-works' },
+  { labelKey: 'nav.philosophy', path: '/why-healix' },
 ]
 
 const F = "'Times New Roman', Georgia, serif"
@@ -16,6 +17,7 @@ const FM = "'DM Mono', monospace"
 
 export default function Navbar() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -28,10 +30,10 @@ export default function Navbar() {
   }, [])
 
   const getCTA = () => {
-    if (pathname === '/hospital-matches') return { label: 'Reserve Access', path: '/welcome' }
-    if (pathname === '/dashboard' || pathname === '/intelligence') return { label: 'View Matches', path: '/hospital-matches' }
-    if (pathname === '/welcome') return { label: 'Dashboard', path: '/dashboard' }
-    return { label: 'Begin Assessment', path: '/input' }
+    if (pathname === '/hospital-matches') return { label: t('nav.cta_reserve'), path: '/welcome' }
+    if (pathname === '/dashboard' || pathname === '/intelligence') return { label: t('nav.cta_viewMatches'), path: '/hospital-matches' }
+    if (pathname === '/welcome') return { label: t('nav.cta_dashboard'), path: '/dashboard' }
+    return { label: t('nav.beginAssessment'), path: '/input' }
   }
   const cta = getCTA()
 
@@ -62,7 +64,7 @@ export default function Navbar() {
         </button>
 
         <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {NAV_LINKS.map(l => {
+          {NAV_LINKS_KEYS.map(l => {
             const active = pathname === l.path
             return (
               <button key={l.path} onClick={() => navigate(l.path)}
@@ -77,12 +79,13 @@ export default function Navbar() {
                 }}
                 onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#0B1F3D' }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'rgba(11,31,61,0.45)' }}
-              >{l.label}</button>
+              >{t(l.labelKey)}</button>
             )
           })}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <LanguageSelector />
           {/* Dark mode toggle */}
           <motion.button
             onClick={() => setDark(d => !d)}
@@ -127,9 +130,9 @@ export default function Navbar() {
               display: 'flex', flexDirection: 'column', gap: 8,
               boxShadow: '-8px 0 24px rgba(11,31,61,0.06)',
             }}>
-            {NAV_LINKS.map(l => (
+            {NAV_LINKS_KEYS.map(l => (
               <button key={l.path} onClick={() => { navigate(l.path); setMobileOpen(false) }}
-                style={{ background: pathname === l.path ? 'rgba(212,175,55,0.08)' : 'transparent', border: 'none', borderRadius: 10, padding: '14px 16px', textAlign: 'left', cursor: 'pointer', fontFamily: F, fontSize: 16, fontWeight: 400, color: '#0B1F3D' }}>{l.label}</button>
+                style={{ background: pathname === l.path ? 'rgba(212,175,55,0.08)' : 'transparent', border: 'none', borderRadius: 10, padding: '14px 16px', textAlign: 'left', cursor: 'pointer', fontFamily: F, fontSize: 16, fontWeight: 400, color: '#0B1F3D' }}>{t(l.labelKey)}</button>
             ))}
             <div style={{ height: 1, background: 'rgba(11,31,61,0.06)', margin: '12px 0' }} />
             <button onClick={() => { navigate(cta.path); setMobileOpen(false) }} className="btn-primary" style={{ textAlign: 'center', marginTop: 8 }}>{cta.label}</button>

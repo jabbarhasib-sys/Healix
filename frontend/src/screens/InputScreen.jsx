@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import useStore from '../store/useStore'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -101,6 +102,7 @@ const GEO_CITY_MAP = {
 
 export default function InputScreen() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { 
     symptomsText, setSymptomsText,
     patientName, setPatientName,
@@ -120,9 +122,9 @@ export default function InputScreen() {
 
   const handleNext = () => {
     const newErrors = {}
-    if (!patientName.trim()) newErrors.name = 'Patient name is required'
-    if (!patientAge)         newErrors.age  = 'Age is required'
-    if (!symptomsText.trim()) newErrors.symptoms = 'Please describe your symptoms'
+    if (!patientName.trim()) newErrors.name = t('input.errName')
+    if (!patientAge)         newErrors.age  = t('input.errAge')
+    if (!symptomsText.trim()) newErrors.symptoms = t('input.errSymptoms')
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       return
@@ -228,22 +230,21 @@ export default function InputScreen() {
   }
 
   const examples = [
-    "Severe chest pain radiating to my left arm for the last 2 hours.",
-    "Persistent high fever with severe joint pain and a rash.",
-    "Worst headache of my life with sudden neck stiffness.",
-    "Abdominal pain in the lower right side with nausea."
+    t('input.ex1'),
+    t('input.ex2'),
+    t('input.ex3'),
+    t('input.ex4'),
   ]
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5F3F0', fontFamily: F, position: 'relative', overflowX: 'hidden' }}>
-      <DNA3D />
       <Navbar />
 
       <div style={{ maxWidth: 950, margin: '0 auto', padding: '120px 24px 80px', position: 'relative', zIndex: 1, background: 'radial-gradient(circle, rgba(245,243,240,0.9) 0%, rgba(245,243,240,0) 80%)' }}>
         <SectionReveal>
-          <div className="label" style={{ marginBottom: 16, textAlign: 'center' }}>Clinical Intake</div>
+          <div className="label" style={{ marginBottom: 16, textAlign: 'center' }}>{t('input.label')}</div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 700, textAlign: 'center', color: '#0B1F3D', letterSpacing: -1, lineHeight: 1.1, marginBottom: 20 }}>
-            Tell Your <em style={{ fontStyle: 'italic', fontWeight: 400, color: '#D4AF37' }}>Story.</em>
+            {t('input.heading')}
           </h1>
         </SectionReveal>
 
@@ -256,14 +257,14 @@ export default function InputScreen() {
                 {/* Patient Name — mandatory */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div className="label-muted">Patient Name</div>
-                    <span style={{ fontSize: 10, color: '#C62828', fontFamily: FM, fontWeight: 700 }}>* required</span>
+                    <div className="label-muted">{t('input.patientName')}</div>
+                    <span style={{ fontSize: 10, color: '#C62828', fontFamily: FM, fontWeight: 700 }}>* {t('input.required')}</span>
                   </div>
                   <input
                     type="text"
                     value={patientName}
                     onChange={e => { setPatientName(e.target.value); setErrors(prev => ({ ...prev, name: undefined })) }}
-                    placeholder="Full Name"
+                    placeholder={t('input.namePlaceholder')}
                     style={{
                       width: '100%', background: errors.name ? 'rgba(198,40,40,0.04)' : '#F9F9F9',
                       border: errors.name ? '1.5px solid #C62828' : '1px solid rgba(0,0,0,0.05)',
@@ -277,14 +278,14 @@ export default function InputScreen() {
                 {/* Age — mandatory */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div className="label-muted">Age</div>
+                    <div className="label-muted">{t('input.age')}</div>
                     <span style={{ fontSize: 10, color: '#C62828', fontFamily: FM, fontWeight: 700 }}>*</span>
                   </div>
                   <input
                     type="number"
                     value={patientAge}
                     onChange={e => { setPatientAge(e.target.value); setErrors(prev => ({ ...prev, age: undefined })) }}
-                    placeholder="yrs"
+                    placeholder={t('input.agePlaceholder')}
                     min="0" max="120"
                     style={{
                       width: '100%', background: errors.age ? 'rgba(198,40,40,0.04)' : '#F9F9F9',
@@ -298,13 +299,13 @@ export default function InputScreen() {
 
                 {/* Gender — optional */}
                 <div>
-                  <div className="label-muted" style={{ marginBottom: 8 }}>Gender</div>
+                  <div className="label-muted" style={{ marginBottom: 8 }}>{t('input.gender')}</div>
                   <select value={patientGender} onChange={e => setPatientGender(e.target.value)}
                     style={{ width: '100%', background: '#F9F9F9', border: '1px solid rgba(0,0,0,0.05)', borderRadius: 8, padding: '12px 14px', fontFamily: F, fontSize: 15, cursor: 'pointer' }}>
-                    <option value="">Select</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="">{t('input.genderSelect')}</option>
+                    <option value="male">{t('input.genderMale')}</option>
+                    <option value="female">{t('input.genderFemale')}</option>
+                    <option value="other">{t('input.genderOther')}</option>
                   </select>
                 </div>
               </div>
@@ -322,7 +323,7 @@ export default function InputScreen() {
                   onChange={e => setSymptomsText(e.target.value)}
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
-                  placeholder="e.g., I have been feeling a sharp pain in my chest..."
+                  placeholder={t('input.symptomsPlaceholder')}
                   style={{ width: '100%', height: 160, background: 'transparent', border: 'none', resize: 'none',
                     fontFamily: F, fontSize: 18, color: '#0B1F3D', lineHeight: 1.6, outline: 'none', marginBottom: 24 }}
                 />
@@ -338,7 +339,7 @@ export default function InputScreen() {
                         onChange={e => handleSelectCity(e.target.value)}
                         style={{ background: 'transparent', border: 'none', outline: 'none', fontFamily: F, fontSize: 13, color: '#0B1F3D', cursor: 'pointer' }}
                       >
-                        <option value="">Select City</option>
+                        <option value="">{t('input.selectCity')}</option>
                         {SUPPORTED_CITIES.map(c => (
                           <option key={c} value={c}>{c}</option>
                         ))}
@@ -358,10 +359,10 @@ export default function InputScreen() {
                       {isLocating ? (
                         <>
                           <span style={{ width: 10, height: 10, borderRadius: '50%', border: '2px solid #1976D2', borderTopColor: 'transparent', animation: 'spin 0.6s linear infinite', display: 'inline-block' }} />
-                          Locating...
+                          {t('input.locating')}
                         </>
                       ) : (
-                        <>🎯 Use My Location</>
+                        <>🎯 {t('input.useMyLocation')}</>
                       )}
                     </motion.button>
                   </div>
@@ -373,7 +374,7 @@ export default function InputScreen() {
                     whileTap={{ scale: isFormValid ? 0.98 : 1 }}
                     style={{ opacity: isFormValid ? 1 : 0.55, padding: '12px 32px', cursor: isFormValid ? 'pointer' : 'not-allowed' }}
                   >
-                    Analyse Case →
+                    {t('input.analyseBtn')}
                   </motion.button>
                 </div>
               </div>
@@ -382,7 +383,7 @@ export default function InputScreen() {
             {/* ── Examples ── */}
             <SectionReveal delay={0.2}>
               <div>
-                <div className="label-muted" style={{ marginBottom: 12 }}>Clinical Examples</div>
+                <div className="label-muted" style={{ marginBottom: 12 }}>{t('input.examples')}</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   {examples.map((ex, i) => (
                     <button key={i} onClick={() => setSymptomsText(ex)}
@@ -401,7 +402,7 @@ export default function InputScreen() {
           <SectionReveal delay={0.3} direction="left">
             <div className="card" style={{ padding: 24, minHeight: 480 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <div className="label">Emergency Routing</div>
+                <div className="label">{t('input.emergencyRouting')}</div>
                 {location?.city && (
                   <span style={{ fontFamily: FM, fontSize: 10, color: '#1976D2', fontWeight: 700, background: 'rgba(25,118,210,0.08)', padding: '3px 8px', borderRadius: 20 }}>
                     📍 {location.city}
@@ -413,8 +414,8 @@ export default function InputScreen() {
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
                   <div style={{ fontSize: 32, marginBottom: 16 }}>🗺️</div>
                   <p style={{ fontSize: 13, color: '#6B7B8D', fontFamily: F, lineHeight: 1.7, opacity: 0.7 }}>
-                    Select a city from the dropdown or tap<br/>
-                    <strong>"Use My Location"</strong> to see relevant hospitals.
+                    {t('input.selectCityPrompt')}<br/>
+                    <strong>{t('input.useMyLocationStr')}</strong> {t('input.toSeeHospitals')}
                   </p>
                   <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {SUPPORTED_CITIES.map(c => (
@@ -430,12 +431,12 @@ export default function InputScreen() {
               ) : isLocating ? (
                 <div style={{ textAlign: 'center', padding: '60px 0' }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid rgba(11,31,61,0.1)', borderTopColor: '#0B1F3D', animation: 'spin 0.7s linear infinite', margin: '0 auto 16px' }} />
-                  <p style={{ fontSize: 13, color: '#6B7B8D' }}>Finding hospitals in {selectedCity}...</p>
+                  <p style={{ fontSize: 13, color: '#6B7B8D' }}>{t('input.findingHospitals')} {selectedCity}...</p>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                   <div style={{ padding: '7px 12px', background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: 8, fontSize: 10, color: '#B8962E', fontWeight: 700, textAlign: 'center', letterSpacing: 0.5, marginBottom: 20 }}>
-                    MATCHED TO YOUR SYMPTOMS
+                    {t('input.matchedSymptoms')}
                   </div>
                   {nearbyHospitals.map((h, i) => (
                     <motion.div key={i}
@@ -478,7 +479,7 @@ export default function InputScreen() {
                           {h.user_ratings_total > 0 && <span style={{ fontSize: 10, color: '#8A97A6' }}>({h.user_ratings_total.toLocaleString()} reviews)</span>}
                         </div>
                       ) : (
-                        <div style={{ fontSize: 10, color: '#aaa', fontFamily: FM, marginBottom: 4 }}>📍 OpenStreetMap verified</div>
+                        <div style={{ fontSize: 10, color: '#aaa', fontFamily: FM, marginBottom: 4 }}>{t('input.osmVerified')}</div>
                       )}
 
                       <p style={{ fontSize: 12, color: '#6B7B8D', margin: '0 0 4px', lineHeight: 1.4 }}>{h.address}</p>
@@ -491,7 +492,7 @@ export default function InputScreen() {
                         </div>
                       )}
 
-                      <span style={{ fontSize: 11, color: '#1976D2', fontWeight: 600 }}>📍 View on Google Maps →</span>
+                      <span style={{ fontSize: 11, color: '#1976D2', fontWeight: 600 }}>{t('input.viewOnMaps')}</span>
                     </motion.div>
                   ))}
                 </div>
