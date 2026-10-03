@@ -1,31 +1,35 @@
-.PHONY: dev seed train build clean test
+import pytest
+from fastapi.testclient import TestClient
+from main import app
 
-dev:
-	cd backend && uvicorn main:app --reload --port 8000
+client = TestClient(app)
 
-seed:
-	cd backend && python ../data/scripts/generate_hospitals.py
-	cd backend && python ../data/scripts/generate_symptoms.py
-	cd backend && python ../data/scripts/generate_costs.py
-	cd backend && python ../data/scripts/seed_database.py
-	cd backend && python ../data/scripts/build_vectorstore.py
+def test_root_endpoint():
+    response = client.get("/")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["service"] == "HEALIX AI"
+    assert data["status"] == "online"
 
-train:
-	cd backend && python ml/train_models.py
+def test_health_check_endpoint():
+    response = client.get("/api/health")
+    assert response.status_code == 200
 
-setup: seed train
-	@echo "✓ HEALIX AI ready — run: make dev"
+def test_pipeline_run_valid():
+    payload = {
+        "symptoms_text": "I have severe chest pain and dizziness",
+        "patient_name": "Test User",
+        "patient_age": 35
+    }
+    response = client.post("/api/pipeline/run", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert "clinical" in data
+    assert "risk" in data
 
-test:
-	cd backend && pytest tests/ -v
+def test_pipeline_run_short_symptoms_validation():
+    payload = {"symptoms_text": "hi"}
+    response = client.post("/api/pipeline/run", json=payload)
+    assert response.status_code == 422
 
-clean:
-	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-	find . -name "*.pyc" -delete 2>/dev/null || true
-
-frontend:
-	cd frontend && npm run dev
-
-install:
-	pip install -r backend/requirements.txt
-	cd frontend && npm install

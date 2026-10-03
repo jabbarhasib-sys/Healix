@@ -186,6 +186,10 @@ export default function Dashboard() {
             style={{ padding: '16px 48px', fontSize: 16, marginRight: 12 }}>
             {t('dashboard.viewHospitals')}
           </motion.button>
+          <button onClick={() => window.print()}
+            className="btn-outline" style={{ padding: '15px 32px', fontSize: 15, marginRight: 12 }}>
+            📄 Export / Print PDF
+          </button>
           <button onClick={() => { reset(); navigate('/') }}
             className="btn-outline" style={{ padding: '15px 32px', fontSize: 15 }}>
             {t('dashboard.newCase')}

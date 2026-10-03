@@ -10,6 +10,7 @@ const NAV_LINKS_KEYS = [
   { labelKey: 'nav.home',       path: '/' },
   { labelKey: 'nav.howItWorks', path: '/how-it-works' },
   { labelKey: 'nav.philosophy', path: '/why-healix' },
+  { label: 'My Records',        path: '/history' },
 ]
 
 const F = "'Times New Roman', Georgia, serif"
@@ -79,7 +80,7 @@ export default function Navbar() {
                 }}
                 onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#0B1F3D' }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'rgba(11,31,61,0.45)' }}
-              >{t(l.labelKey)}</button>
+              >{l.labelKey ? t(l.labelKey) : l.label}</button>
             )
           })}
         </div>
