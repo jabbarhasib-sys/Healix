@@ -227,70 +227,77 @@ def _classify_symptoms(raw: str) -> dict:
     }
 
 
-def _demo_hospitals(specialty: str, er_only: bool) -> list:
-    """Return specialty-matched demo hospitals when DB is empty."""
-    all_hospitals = {
-        "Cardiology": [
-            {"id": "h-c1", "name": "Apollo Heart Institute", "city": "Mumbai", "er_capable": True,
-             "nabl_certified": True, "jci_certified": True, "tier": "premium", "distance_km": 1.2,
-             "base_rate": 5500, "success_rate": 0.97, "wait_time_mins": 10, "rating": 4.9,
-             "specialties": ["Cardiology", "Cardiac Surgery"]},
-            {"id": "h-c2", "name": "Fortis Heart Centre", "city": "Mumbai", "er_capable": True,
-             "nabl_certified": True, "jci_certified": True, "tier": "super_specialty", "distance_km": 3.0,
-             "base_rate": 4200, "success_rate": 0.95, "wait_time_mins": 15, "rating": 4.7,
-             "specialties": ["Cardiology"]},
-        ],
-        "Neurology": [
-            {"id": "h-n1", "name": "NIMHANS Neurology Centre", "city": "Mumbai", "er_capable": True,
-             "nabl_certified": True, "jci_certified": True, "tier": "super_specialty", "distance_km": 2.1,
-             "base_rate": 4000, "success_rate": 0.94, "wait_time_mins": 20, "rating": 4.8,
-             "specialties": ["Neurology", "Neuro Surgery"]},
-            {"id": "h-n2", "name": "Brain & Spine Hospital", "city": "Mumbai", "er_capable": False,
-             "nabl_certified": True, "jci_certified": False, "tier": "specialty", "distance_km": 4.5,
-             "base_rate": 2800, "success_rate": 0.91, "wait_time_mins": 30, "rating": 4.5,
-             "specialties": ["Neurology"]},
-        ],
-        "Pulmonology": [
-            {"id": "h-p1", "name": "Chest & Allergy Institute", "city": "Mumbai", "er_capable": True,
-             "nabl_certified": True, "jci_certified": False, "tier": "specialty", "distance_km": 2.8,
-             "base_rate": 3200, "success_rate": 0.92, "wait_time_mins": 20, "rating": 4.6,
-             "specialties": ["Pulmonology", "Allergy"]},
-        ],
-        "Gastroenterology": [
-            {"id": "h-g1", "name": "Digestive Health Centre", "city": "Mumbai", "er_capable": False,
-             "nabl_certified": True, "jci_certified": False, "tier": "specialty", "distance_km": 3.5,
-             "base_rate": 2500, "success_rate": 0.90, "wait_time_mins": 25, "rating": 4.4,
-             "specialties": ["Gastroenterology"]},
-        ],
-        "Orthopedics": [
-            {"id": "h-o1", "name": "Bone & Joint Clinic", "city": "Mumbai", "er_capable": False,
-             "nabl_certified": True, "jci_certified": False, "tier": "specialty", "distance_km": 1.8,
-             "base_rate": 2000, "success_rate": 0.93, "wait_time_mins": 15, "rating": 4.7,
-             "specialties": ["Orthopedics"]},
-        ],
-        "Nephrology": [
-            {"id": "h-k1", "name": "Kidney Care Hospital", "city": "Mumbai", "er_capable": False,
-             "nabl_certified": True, "jci_certified": False, "tier": "specialty", "distance_km": 2.3,
-             "base_rate": 2800, "success_rate": 0.91, "wait_time_mins": 20, "rating": 4.5,
-             "specialties": ["Nephrology", "Urology"]},
-        ],
-        "General Medicine": [
-            {"id": "h-gm1", "name": "City General Hospital", "city": "Mumbai", "er_capable": True,
-             "nabl_certified": True, "jci_certified": False, "tier": "general", "distance_km": 0.9,
-             "base_rate": 800, "success_rate": 0.88, "wait_time_mins": 10, "rating": 4.3,
-             "specialties": ["General Medicine", "Internal Medicine"]},
-            {"id": "h-gm2", "name": "LifeLine Multi-Specialty", "city": "Mumbai", "er_capable": True,
-             "nabl_certified": True, "jci_certified": True, "tier": "super_specialty", "distance_km": 2.2,
-             "base_rate": 1800, "success_rate": 0.91, "wait_time_mins": 20, "rating": 4.6,
-             "specialties": ["General Medicine", "Cardiology", "Orthopedics"]},
-        ],
-    }
-    return all_hospitals.get(specialty, all_hospitals["General Medicine"])
+def _demo_hospitals(specialty: str, er_only: bool, city: str = "Bangalore", lat: float | None = None, lng: float | None = None) -> list:
+    """Return localized specialty-matched hospitals & clinics when DB query returns empty."""
+    city_name = (city or "Bangalore").title()
+    is_blr = any(b in city_name.lower() for b in ["bangalore", "bengaluru"])
+
+    if is_blr:
+        facilities = [
+            {"id": "demo-blr-1", "name": "Manipal Hospital (Old Airport Rd)", "city": "Bangalore", "area": "Old Airport Road",
+             "facility_type": "hospital", "er_capable": True, "nabl_certified": True, "jci_certified": True,
+             "tier": "premium", "latitude": 12.9592, "longitude": 77.6489, "distance_km": 2.4,
+             "base_rate": 5500, "success_rate": 0.97, "wait_time_mins": 12, "rating": 4.8,
+             "specialties": ["Cardiology", "Neurology", "Pulmonology", "General Medicine", "Orthopedics"]},
+            {"id": "demo-blr-2", "name": "Apollo Hospital (Bannerghatta)", "city": "Bangalore", "area": "Bannerghatta Road",
+             "facility_type": "hospital", "er_capable": True, "nabl_certified": True, "jci_certified": True,
+             "tier": "premium", "latitude": 12.8958, "longitude": 77.5966, "distance_km": 4.1,
+             "base_rate": 5200, "success_rate": 0.96, "wait_time_mins": 15, "rating": 4.8,
+             "specialties": ["Cardiology", "Pulmonology", "Gastroenterology", "General Medicine"]},
+            {"id": "demo-blr-3", "name": "Apollo Clinic (Indiranagar)", "city": "Bangalore", "area": "Indiranagar",
+             "facility_type": "clinic", "er_capable": False, "nabl_certified": True, "jci_certified": False,
+             "tier": "clinic", "latitude": 12.9784, "longitude": 77.6408, "distance_km": 1.8,
+             "base_rate": 800, "success_rate": 0.94, "wait_time_mins": 8, "rating": 4.7,
+             "specialties": ["General Medicine", "Cardiology", "Orthopedics", "Paediatrics"]},
+            {"id": "demo-blr-4", "name": "Practo Care Clinic (HSR Layout)", "city": "Bangalore", "area": "HSR Layout",
+             "facility_type": "clinic", "er_capable": False, "nabl_certified": True, "jci_certified": False,
+             "tier": "clinic", "latitude": 12.9116, "longitude": 77.6389, "distance_km": 3.2,
+             "base_rate": 700, "success_rate": 0.93, "wait_time_mins": 10, "rating": 4.6,
+             "specialties": ["General Medicine", "Orthopedics", "Gastroenterology"]},
+            {"id": "demo-blr-5", "name": "NIMHANS Neuro Centre", "city": "Bangalore", "area": "Hosur Road",
+             "facility_type": "hospital", "er_capable": True, "nabl_certified": True, "jci_certified": False,
+             "tier": "super_specialty", "latitude": 12.9405, "longitude": 77.5986, "distance_km": 3.8,
+             "base_rate": 2500, "success_rate": 0.98, "wait_time_mins": 20, "rating": 4.9,
+             "specialties": ["Neurology", "Neuro Surgery", "Psychiatry", "General Medicine"]},
+            {"id": "demo-blr-6", "name": "Aster CMI Hospital", "city": "Bangalore", "area": "Hebbal",
+             "facility_type": "hospital", "er_capable": True, "nabl_certified": True, "jci_certified": True,
+             "tier": "premium", "latitude": 13.0562, "longitude": 77.5912, "distance_km": 6.5,
+             "base_rate": 4800, "success_rate": 0.95, "wait_time_mins": 15, "rating": 4.7,
+             "specialties": ["Gastroenterology", "Pulmonology", "General Medicine", "Cardiology"]},
+            {"id": "demo-blr-7", "name": "MedPlus Family Clinic (Koramangala)", "city": "Bangalore", "area": "Koramangala",
+             "facility_type": "clinic", "er_capable": False, "nabl_certified": True, "jci_certified": False,
+             "tier": "clinic", "latitude": 12.9352, "longitude": 77.6245, "distance_km": 1.5,
+             "base_rate": 500, "success_rate": 0.92, "wait_time_mins": 5, "rating": 4.6,
+             "specialties": ["General Medicine", "Infectious", "Pulmonology"]},
+        ]
+    else:
+        facilities = [
+            {"id": f"demo-{city_name.lower()}-1", "name": f"Apollo Hospital ({city_name})", "city": city_name, "area": "Central",
+             "facility_type": "hospital", "er_capable": True, "nabl_certified": True, "jci_certified": True,
+             "tier": "premium", "distance_km": 2.5, "base_rate": 4500, "success_rate": 0.96,
+             "wait_time_mins": 15, "rating": 4.8, "specialties": [specialty, "General Medicine"]},
+            {"id": f"demo-{city_name.lower()}-2", "name": f"Fortis Multi-Specialty ({city_name})", "city": city_name, "area": "West",
+             "facility_type": "hospital", "er_capable": True, "nabl_certified": True, "jci_certified": True,
+             "tier": "super_specialty", "distance_km": 3.8, "base_rate": 4000, "success_rate": 0.95,
+             "wait_time_mins": 18, "rating": 4.7, "specialties": [specialty, "General Medicine"]},
+            {"id": f"demo-{city_name.lower()}-3", "name": f"City Care Clinic ({city_name})", "city": city_name, "area": "East",
+             "facility_type": "clinic", "er_capable": False, "nabl_certified": True, "jci_certified": False,
+             "tier": "clinic", "distance_km": 1.2, "base_rate": 600, "success_rate": 0.93,
+             "wait_time_mins": 10, "rating": 4.6, "specialties": [specialty, "General Medicine"]},
+        ]
+
+    if er_only:
+        facilities = [f for f in facilities if f.get("er_capable")] or facilities
+
+    return facilities
 
 
 async def run_pipeline(
     raw_input: str,
     session_id: str | None = None,
+    city: str | None = None,
+    lat: float | None = None,
+    lng: float | None = None,
     patient_name: str | None = None,
     patient_age: int | None = None,
     patient_gender: str | None = None,
@@ -299,6 +306,7 @@ async def run_pipeline(
     run_id = str(uuid.uuid4())
     t_start = time.monotonic()
     session_id = session_id or run_id
+    effective_city = (city or "Bangalore").strip()
 
     async def stage(key: str):
         label = _STAGE_LABELS.get(key, key)
@@ -315,9 +323,10 @@ async def run_pipeline(
         # M1 — Parsing
         await stage("parsing")
         parsed = {
-            "age": None, "gender": "unknown",
+            "age": patient_age, "gender": patient_gender or "unknown",
             "symptoms": [raw_input[:60]],
             "duration": "recent", "severity": profile["severity"],
+            "city": effective_city,
             "budget_inr": None, "_source": "demo_cache"
         }
 
@@ -345,21 +354,24 @@ async def run_pipeline(
         async with SessionLocal() as db:
             hospitals_raw = await get_hospitals(
                 db,
+                city=effective_city,
                 er_only=risk["is_emergency"],
                 specialties=[profile["specialty"]],
-                limit=50,
+                limit=60,
             )
             hospitals_dicts = [h.to_dict() for h in hospitals_raw]
 
         if not hospitals_dicts:
-            logger.warning("DB empty — using specialty-matched demo hospitals")
-            hospitals_dicts = _demo_hospitals(profile["specialty"], profile["is_emergency"])
+            logger.warning(f"DB search empty for {effective_city} — using localized demo facilities")
+            hospitals_dicts = _demo_hospitals(profile["specialty"], risk["is_emergency"], city=effective_city, lat=lat, lng=lng)
 
         ranked, weights = decision_engine.rank(
             hospitals=hospitals_dicts,
             conditions=clinical.get("conditions", []),
             urgency=risk["urgency_level"],
             budget_inr=parsed.get("budget_inr"),
+            user_lat=lat,
+            user_lon=lng,
         )
 
         # M4 — Cost Model

@@ -15,17 +15,21 @@ router = APIRouter()
 @router.post("/run", response_model=PipelineResponse, summary="Run full 6-module AI pipeline")
 async def run(req: PipelineRequest, db: AsyncSession = Depends(get_db)):
     t = time.monotonic()
+    city_name = (req.city or "Bangalore").strip()
     try:
         result = await run_pipeline(
             raw_input=req.symptoms_text,
             session_id=req.session_id,
+            city=city_name,
+            lat=req.lat,
+            lng=req.lng,
             patient_name=req.patient_name,
             patient_age=req.patient_age,
             patient_gender=req.patient_gender,
         )
         logger.info(
             f"Pipeline OK | {round((time.monotonic()-t)*1000)}ms | "
-            f"emergency={result['risk']['is_emergency']}"
+            f"city={city_name} | emergency={result['risk']['is_emergency']}"
         )
         return {"success": True, **result}
     except ValueError as e:
@@ -41,7 +45,7 @@ async def run(req: PipelineRequest, db: AsyncSession = Depends(get_db)):
             "patient_name": req.patient_name,
             "patient_age": req.patient_age,
             "patient_gender": req.patient_gender,
-            "parsed_input": {"symptoms": [req.symptoms_text[:60]], "severity": "moderate", "_source": "fallback"},
+            "parsed_input": {"symptoms": [req.symptoms_text[:60]], "severity": "moderate", "city": city_name, "_source": "fallback"},
             "clinical": {
                 "conditions": [
                     {"name": "General Systemic Condition", "probability": 0.78, "icd10_code": "R69",
@@ -62,21 +66,21 @@ async def run(req: PipelineRequest, db: AsyncSession = Depends(get_db)):
                 "recommended_action": "Schedule a consultation with a general physician.",
             },
             "hospitals": [
-                {"id": "h-demo-1", "name": "Apollo Hospital", "city": "Mumbai", "er_capable": True,
+                {"id": "h-demo-1", "name": f"Manipal Hospital ({city_name})", "city": city_name, "facility_type": "hospital", "er_capable": True,
                  "tier": "super_specialty", "distance_km": 2.1, "rating": 4.8, "wait_time_mins": 15,
                  "specialties": ["General Medicine", "Cardiology"], "score": 0.92,
                  "cost_estimate": {"min": 800, "estimate": 1200, "max": 1800, "currency": "INR",
                                    "estimated_days": 1, "breakdown": {"Consultation Fees": 480, "Diagnostics & Labs": 420, "Medication": 240, "Procedures & Surgery": 60}, "model_confidence": 0.82, "disclaimer": "Estimates based on average costs."}},
-                {"id": "h-demo-2", "name": "Fortis Hospital", "city": "Mumbai", "er_capable": True,
+                {"id": "h-demo-2", "name": f"Apollo Clinic ({city_name})", "city": city_name, "facility_type": "clinic", "er_capable": False,
+                 "tier": "clinic", "distance_km": 1.4, "rating": 4.7, "wait_time_mins": 10,
+                 "specialties": ["General Medicine", "Family Medicine"], "score": 0.88,
+                 "cost_estimate": {"min": 400, "estimate": 650, "max": 1000, "currency": "INR",
+                                   "estimated_days": 1, "breakdown": {"Consultation Fees": 350, "Diagnostics & Labs": 200, "Medication": 100, "Procedures & Surgery": 0}, "model_confidence": 0.80, "disclaimer": "Estimates based on average costs."}},
+                {"id": "h-demo-3", "name": f"Fortis Hospital ({city_name})", "city": city_name, "facility_type": "hospital", "er_capable": True,
                  "tier": "premium", "distance_km": 3.4, "rating": 4.6, "wait_time_mins": 20,
                  "specialties": ["General Medicine"], "score": 0.85,
                  "cost_estimate": {"min": 700, "estimate": 1000, "max": 1500, "currency": "INR",
                                    "estimated_days": 1, "breakdown": {"Consultation Fees": 400, "Diagnostics & Labs": 350, "Medication": 200, "Procedures & Surgery": 50}, "model_confidence": 0.78, "disclaimer": "Estimates based on average costs."}},
-                {"id": "h-demo-3", "name": "Lilavati Hospital", "city": "Mumbai", "er_capable": False,
-                 "tier": "specialty", "distance_km": 5.0, "rating": 4.4, "wait_time_mins": 25,
-                 "specialties": ["General Medicine"], "score": 0.77,
-                 "cost_estimate": {"min": 600, "estimate": 900, "max": 1300, "currency": "INR",
-                                   "estimated_days": 1, "breakdown": {"Consultation Fees": 360, "Diagnostics & Labs": 315, "Medication": 180, "Procedures & Surgery": 45}, "model_confidence": 0.74, "disclaimer": "Estimates based on average costs."}},
             ],
             "active_weights": {"spec": 0.35, "cost": 0.25, "dist": 0.20, "rating": 0.20},
             "confidence": {

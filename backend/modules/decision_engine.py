@@ -20,16 +20,36 @@ def _weights(urgency: str, budget_inr: float | None) -> dict:
     return {"spec": 0.35, "cost": 0.25, "dist": 0.20, "rating": 0.20}
 
 
-def _distance_score(hospital: dict, user_lat: float = 12.97, user_lon: float = 77.59) -> float:
-    """Haversine if real coords available, otherwise mock."""
-    lat = hospital.get("latitude") or 12.97
-    lon = hospital.get("longitude") or 77.59
-    dlat = math.radians(lat - user_lat)
-    dlon = math.radians(lon - user_lon)
-    a = math.sin(dlat/2)**2 + math.cos(math.radians(user_lat)) * math.cos(math.radians(lat)) * math.sin(dlon/2)**2
-    dist_km = 6371 * 2 * math.asin(math.sqrt(a))
-    if dist_km < 0.5:
-        dist_km = random.uniform(1.5, 15.0)  # realistic noise for demo data
+def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    R = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    return round(R * 2 * math.asin(math.sqrt(a)), 2)
+
+
+def _distance_score(
+    hospital: dict,
+    user_lat: float | None = None,
+    user_lon: float | None = None,
+) -> tuple[float, float]:
+    """Accurate Haversine distance scoring."""
+    # 1. If distance_km is already precomputed
+    if hospital.get("distance_km") is not None and isinstance(hospital.get("distance_km"), (int, float)):
+        dist_km = float(hospital["distance_km"])
+        return max(0.0, 1.0 - (dist_km / 30.0)), round(dist_km, 1)
+
+    h_lat = hospital.get("latitude")
+    h_lon = hospital.get("longitude")
+
+    if h_lat is not None and h_lon is not None and user_lat is not None and user_lon is not None:
+        dist_km = _haversine_km(user_lat, user_lon, float(h_lat), float(h_lon))
+    elif h_lat is not None and h_lon is not None:
+        # Default Bangalore center reference
+        dist_km = _haversine_km(12.9716, 77.5946, float(h_lat), float(h_lon))
+    else:
+        dist_km = 3.5
+
     return max(0.0, 1.0 - (dist_km / 30.0)), round(dist_km, 1)
 
 
@@ -66,6 +86,8 @@ def rank(
     conditions: list[dict],
     urgency: str,
     budget_inr: float | None,
+    user_lat: float | None = None,
+    user_lon: float | None = None,
 ) -> tuple[list[dict], dict]:
     if not hospitals:
         return [], {}
@@ -86,7 +108,7 @@ def rank(
             continue
 
         spec = _spec_score(h, target_specs)
-        dist_score, dist_km = _distance_score(h)
+        dist_score, dist_km = _distance_score(h, user_lat=user_lat, user_lon=user_lon)
         cost = _cost_fit_score(h, budget_inr, avg_days)
         rating = _rating_score(h)
 
