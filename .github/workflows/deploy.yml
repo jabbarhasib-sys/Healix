@@ -9,7 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Set up Python for lint check
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Lint backend
+        run: |
+          pip install -q ruff
+          ruff check backend/ --select E,F --ignore E501
 
       - name: Copy files to server
         uses: appleboy/scp-action@master
@@ -28,6 +38,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/healix
-            docker-compose down
-            docker-compose up -d --build
-            docker system prune -f
+            docker compose down --remove-orphans
+            docker compose up -d --build
+            docker system prune -f --volumes=false
