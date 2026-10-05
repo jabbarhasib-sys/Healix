@@ -1,4 +1,6 @@
-# HEALIX Workspace - Unused Files Analysis
+# HEALIX Workspace — Unused Files Analysis
+
+> **Last updated:** October 2026 — reflects current codebase state post-cleanup.
 
 ## Summary
 This analysis identifies unused and dead code files in both the backend (Python) and frontend (JavaScript/React) directories. These files are not imported or referenced anywhere in the active codebase.
@@ -64,8 +66,8 @@ Advanced features that have been bypassed for MVP.
 Test files that exist but contain no actual tests.
 
 #### `backend/tests/test_api.py`
-- **Status**: EMPTY
-- **Safe to Delete**: YES, no content
+- **Status**: ✅ ACTIVE — now contains 6 endpoint tests
+- **Safe to Delete**: NO
 
 #### `backend/tests/test_modules.py`
 - **Status**: EMPTY
@@ -95,7 +97,7 @@ Test files that exist but contain no actual tests.
 ### Components Actually Used in Frontend
 The following components ARE properly imported and used:
 
-**Screens (all 14 imported in App.jsx):**
+**Screens (all 16 imported in App.jsx):**
 - Landing.jsx ✓
 - InputScreen.jsx ✓
 - ProcessingScreen.jsx ✓
@@ -110,6 +112,8 @@ The following components ARE properly imported and used:
 - WhyHealix.jsx ✓
 - SecurityCompliance.jsx ✓
 - ImpactResults.jsx ✓
+- PatientHistory.jsx ✓
+- AdminDashboard.jsx ✓
 
 **Components Used:**
 - Navbar.jsx → Used in 14 screens ✓
@@ -132,9 +136,10 @@ The following components ARE properly imported and used:
 1. `frontend/src/components/WaterBackground.jsx` - Empty file, no references
 2. `backend/services/cache.py` - Unused service, no references
 3. `backend/services/embeddings.py` - Unused service, no references
-4. `backend/tests/test_api.py` - Empty test file
-5. `backend/tests/test_modules.py` - Empty test file
-6. `backend/tests/test_pipeline.py` - Empty test file
+4. `backend/tests/test_modules.py` - Empty test file
+5. `backend/tests/test_pipeline.py` - Empty test file
+
+> ✅ `backend/tests/test_api.py` — **removed from deletion list**, now active with 6 tests.
 
 ### Safe to Delete (But Consider Future Use)
 7. `backend/ml/condition_classifier.py` - Only if not planning to use RF models
@@ -178,5 +183,6 @@ Removing unused files will:
 | Unused Components (Frontend) | 1 | Ready to delete |
 | Unused Services (Backend) | 2 | Ready to delete |
 | Unused ML Modules (Backend) | 3 | Safe to delete (caution: future) |
-| Empty Test Files (Backend) | 3 | Ready to delete |
-| **TOTAL** | **9** | **Safe to remove** |
+| Empty Test Files (Backend) | 2 | Ready to delete |
+| Active Test Files (Backend) | 1 | ✅ Now populated |
+| **TOTAL removable** | **8** | **Safe to remove** |
