@@ -1,3 +1,8 @@
+/**
+ * store/useStore.js
+ * Global Zustand store for Healix patient session state.
+ * Persists history, result, and patient details to localStorage.
+ */
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -60,8 +65,11 @@ const useStore = create(
 
       deleteHistoryItem: (runId) =>
         set((s) => ({ history: s.history.filter((item) => item.run_id !== runId) })),
-      
+
       clearHistory: () => set({ history: [] }),
+
+      /** Clear the current error message. */
+      clearError: () => set({ error: null }),
 
       reset: () => set({
         symptomsText: '', sessionId: null, pipelineStage: null,

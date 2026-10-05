@@ -1,8 +1,18 @@
+/**
+ * hooks/useDarkMode.js
+ * Persists dark-mode preference in localStorage and applies it to <html>.
+ * On first visit, respects the OS-level prefers-color-scheme setting.
+ */
 import { useState, useEffect } from 'react'
 
 export function useDarkMode() {
   const [dark, setDark] = useState(() => {
-    try { return localStorage.getItem('healix-dark-mode') === 'true' } catch { return false }
+    try {
+      const stored = localStorage.getItem('healix-dark-mode')
+      if (stored !== null) return stored === 'true'
+      // First visit — honour OS preference
+      return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+    } catch { return false }
   })
 
   // Wrapped toggler — fires a cinematic transition class before switching

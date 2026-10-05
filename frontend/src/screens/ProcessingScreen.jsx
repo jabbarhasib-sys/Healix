@@ -27,6 +27,7 @@ export default function ProcessingScreen() {
   const {
     symptomsText, sessionId,
     patientName, patientAge, patientGender,
+    location,
     pipelineStage, completedStages,
     setResult, setPipelineStage, resetPipeline, setError,
   } = useStore()
@@ -56,6 +57,9 @@ export default function ProcessingScreen() {
       patientName,
       patientAge,
       patientGender,
+      city: location?.city || 'Bangalore',
+      lat: location?.lat,
+      lng: location?.lng,
       onStage: (stageId, label) => setPipelineStage(stageId, label),
       onResult: (data) => {
         clearInterval(ticker)

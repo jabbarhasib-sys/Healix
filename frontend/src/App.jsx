@@ -1,5 +1,9 @@
+/**
+ * App.jsx — Top-level route configuration with code-split lazy loading.
+ * All screens are lazy-loaded for optimal initial bundle size.
+ */
 import { lazy, Suspense } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 
 const Landing           = lazy(() => import('./screens/Landing'))
@@ -69,6 +73,8 @@ export default function App() {
           <Route path="/impact"          element={<ImpactResults />} />
           <Route path="/history"         element={<PatientHistory />} />
           <Route path="/admin"           element={<AdminDashboard />} />
+          {/* Catch-all: redirect unknown paths to landing */}
+          <Route path="*"               element={<Navigate to="/" replace />} />
         </Routes>
       </AnimatePresence>
     </Suspense>

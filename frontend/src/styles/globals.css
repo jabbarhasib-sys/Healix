@@ -850,10 +850,12 @@
 }
 
 /* ── Utility Animations ──────────────────────────────────────────── */
-@keyframes spin    { to { transform: rotate(360deg); } }
-@keyframes pulse   { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.92); } }
-@keyframes fadeUp  { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-@keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
+@keyframes spin      { to { transform: rotate(360deg); } }
+@keyframes pulse     { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.92); } }
+@keyframes fadeUp    { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
+@keyframes gpsPulse  { 0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 0 0 rgba(46,125,50,0.4); }
+                       50% { opacity:0.7; transform:scale(1.35); box-shadow:0 0 0 4px rgba(46,125,50,0); } }
 
 /* ── Focus States ────────────────────────────────────────────────── */
 input:focus, textarea:focus, select:focus {
