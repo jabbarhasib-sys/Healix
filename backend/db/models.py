@@ -16,6 +16,7 @@ def _uuid() -> str:
 
 
 class HospitalTier(str, enum.Enum):
+    clinic = "clinic"
     government = "government"
     mid = "mid"
     premium = "premium"
@@ -29,6 +30,7 @@ class Hospital(Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
     city: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     area: Mapped[str] = mapped_column(String(200), nullable=True)
+    facility_type: Mapped[str] = mapped_column(String(50), default="hospital")
     tier: Mapped[HospitalTier] = mapped_column(SAEnum(HospitalTier), default=HospitalTier.mid)
 
     # Ratings & capacity
@@ -60,6 +62,7 @@ class Hospital(Base):
             "name": self.name,
             "city": self.city,
             "area": self.area,
+            "facility_type": self.facility_type or ("clinic" if self.tier.value == "clinic" else "hospital"),
             "tier": self.tier.value,
             "rating": self.rating,
             "total_beds": self.total_beds,
@@ -67,6 +70,8 @@ class Hospital(Base):
             "er_capable": self.er_capable,
             "nabl_certified": self.nabl_certified,
             "jci_certified": self.jci_certified,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
             "base_cost_per_day": self.base_cost_per_day,
             "tier_factor": self.tier_factor,
             "location_factor": self.location_factor,

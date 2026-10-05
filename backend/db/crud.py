@@ -16,26 +16,44 @@ async def get_hospitals(
     stmt = select(Hospital)
 
     if city:
-        stmt = stmt.where(Hospital.city.ilike(f"%{city}%"))
+        city_clean = city.strip()
+        if city_clean.lower() in ("bangalore", "bengaluru"):
+            stmt = stmt.where(
+                or_(
+                    Hospital.city.ilike("%bangalore%"),
+                    Hospital.city.ilike("%bengaluru%"),
+                    Hospital.area.ilike("%bangalore%"),
+                )
+            )
+        else:
+            stmt = stmt.where(
+                or_(
+                    Hospital.city.ilike(f"%{city_clean}%"),
+                    Hospital.area.ilike(f"%{city_clean}%"),
+                )
+            )
+
     if er_only:
         stmt = stmt.where(Hospital.er_capable == True)
 
     stmt = stmt.limit(limit)
     result = await db.execute(stmt)
-    hospitals = result.scalars().all()
+    hospitals = list(result.scalars().all())
 
-    # Filter by specialty in Python (JSON array filtering varies by DB)
+    # Filter by specialty in Python
     if specialties:
         specialties_lower = [s.lower() for s in specialties]
-        hospitals = [
+        spec_matched = [
             h for h in hospitals
             if h.specialties and any(
                 any(spec in hs.lower() for spec in specialties_lower)
                 for hs in h.specialties
             )
         ]
+        if spec_matched:
+            hospitals = spec_matched
 
-    return list(hospitals)
+    return hospitals
 
 
 async def log_pipeline_run(db: AsyncSession, run_data: dict) -> PipelineRun:
