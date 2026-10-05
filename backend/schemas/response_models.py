@@ -1,5 +1,5 @@
-"""schemas/response_models.py"""
-from pydantic import BaseModel
+"""schemas/response_models.py — Pydantic response schemas for all API endpoints."""
+from pydantic import BaseModel, Field
 from typing import Optional, Any
 
 
@@ -69,3 +69,4 @@ class PipelineResponse(BaseModel):
     confidence: ConfidenceResult
     explanation: dict[str, Any]
     meta: dict[str, Any]
+    processing_time_ms: Optional[float] = Field(None, description="Total pipeline duration in milliseconds")
