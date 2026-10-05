@@ -658,6 +658,8 @@ export default function InputScreen() {
                     )
                   })}
                 </div>
+              )}
+
               {/* Google Maps Fallback Button */}
               {gmapsNearbyUrl && (
                 <a
