@@ -41,13 +41,26 @@ class DatabaseError(HealixBaseException):
         super().__init__(detail, code="DB_ERROR")
 
 
+class RateLimitError(HealixBaseException):
+    def __init__(self, limit: int = 10):
+        super().__init__(
+            f"Rate limit exceeded ({limit} requests/min). Please slow down.",
+            code="RATE_LIMIT",
+        )
+
+
 # ── FastAPI exception handlers ───────────────────────────────────────────────
 
 async def healix_exception_handler(
     request: Request, exc: HealixBaseException
 ) -> JSONResponse:
     logger.warning(f"[{exc.code}] {exc.message} | path={request.url.path}")
-    status = 503 if isinstance(exc, LLMUnavailableError) else 400
+    if isinstance(exc, LLMUnavailableError):
+        status = 503
+    elif isinstance(exc, RateLimitError):
+        status = 429
+    else:
+        status = 400
     return JSONResponse(
         status_code=status,
         content={

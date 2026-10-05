@@ -1,3 +1,4 @@
+"""core/logger.py — Structured logging setup using loguru."""
 import sys
 from loguru import logger
 from .config import settings
@@ -23,14 +24,15 @@ def setup_logger() -> None:
         diagnose=settings.debug,
     )
 
-    # File (errors only in prod)
+    # File sink — rotates daily, keeps 14 days of compressed logs
     logger.add(
         "logs/healix_{time:YYYY-MM-DD}.log",
         format=fmt,
-        level="ERROR",
+        level="WARNING",
         rotation="00:00",
-        retention="7 days",
+        retention="14 days",
         compression="zip",
+        enqueue=True,  # thread-safe async write
     )
 
     logger.info(
@@ -39,5 +41,10 @@ def setup_logger() -> None:
     )
 
 
+def get_log_level() -> str:
+    """Return the effective log level based on debug/env settings."""
+    return "DEBUG" if settings.debug else "INFO"
+
+
 # Re-export so all files do: from core.logger import logger
-__all__ = ["logger", "setup_logger"]
+__all__ = ["logger", "setup_logger", "get_log_level"]

@@ -52,6 +52,8 @@ class Settings(BaseSettings):
     max_hospitals: int = 8
     confidence_min: float = 0.2
     confidence_max: float = 0.95
+    log_pipeline_steps: bool = True       # detailed per-stage logging
+    max_condition_depth: int = 3          # max differential diagnosis depth
 
     @property
     def is_production(self) -> bool:
