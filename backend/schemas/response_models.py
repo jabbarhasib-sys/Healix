@@ -29,15 +29,17 @@ class HospitalResult(BaseModel):
     name: str
     city: str
     area: Optional[str] = None
-    tier: str
-    rating: float
+    facility_type: Optional[str] = "hospital"
+    tier: str = "mid"
+    rating: float = 4.0
+    wait_time_mins: Optional[int] = None
     distance_km: Optional[float] = None
-    er_capable: bool
-    nabl_certified: bool
-    jci_certified: bool
+    er_capable: bool = False
+    nabl_certified: bool = False
+    jci_certified: bool = False
     specialties: list[str] = []
-    score: float
-    score_breakdown: dict[str, float]
+    score: float = 0.8
+    score_breakdown: dict[str, float] = {}
     cost_estimate: Optional[CostEstimate] = None
 
 

@@ -10,7 +10,13 @@ from sqlalchemy.orm import DeclarativeBase
 from core.config import settings
 from core.logger import logger
 
+import os
+
 _url = settings.database_url
+
+# Serverless environment (e.g. Vercel) has read-only filesystem except /tmp
+if os.environ.get("VERCEL") and "sqlite" in _url:
+    _url = "sqlite+aiosqlite:////tmp/healix.db"
 
 # ── SQLite — local dev only ───────────────────────────────────────────────────
 if _url.startswith("sqlite"):
@@ -65,10 +71,39 @@ class Base(DeclarativeBase):
 
 # ── Initialise tables (idempotent) ────────────────────────────────────────────
 async def init_db():
-    """Create all ORM tables if they do not yet exist (safe to call on every startup)."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("DB tables ready")
+    """Create all ORM tables if they do not yet exist and auto-seed if empty."""
+    try:
+        import db.models  # ensure models are registered with Base.metadata # noqa: F401
+    except ImportError:
+        pass
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("DB tables ready")
+
+        # Auto-seed initial hospital catalog if empty
+        try:
+            from db.models import Hospital
+            from db.crud import bulk_insert_hospitals
+            import json
+            from pathlib import Path
+            from sqlalchemy import select, func
+
+            async with SessionLocal() as session:
+                res = await session.execute(select(func.count()).select_from(Hospital))
+                count = res.scalar_one()
+                if count == 0:
+                    data_file = Path(__file__).resolve().parent.parent.parent / "data" / "synthetic" / "hospitals.json"
+                    if data_file.exists():
+                        with open(data_file, encoding="utf-8") as f:
+                            hospitals_data = json.load(f)
+                        await bulk_insert_hospitals(session, hospitals_data)
+                        await session.commit()
+                        logger.info(f"Auto-seeded {len(hospitals_data)} hospitals into database.")
+        except Exception as seed_err:
+            logger.debug(f"Auto-seed check note: {seed_err}")
+    except Exception as exc:
+        logger.warning(f"DB initialization warning: {exc}")
 
 
 # ── FastAPI dependency ────────────────────────────────────────────────────────
