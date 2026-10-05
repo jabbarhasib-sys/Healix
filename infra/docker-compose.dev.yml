@@ -15,10 +15,11 @@ services:
     environment:
       - APP_ENV=development
       - DEBUG=true
+      - LOG_PIPELINE_STEPS=true
       - DATABASE_URL=postgresql://healix:healix@postgres:5432/healix_db
       - REDIS_URL=redis://redis:6379/0
       - OLLAMA_BASE_URL=http://ollama:11434
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
     ports:
       - "8000:8000"
 
