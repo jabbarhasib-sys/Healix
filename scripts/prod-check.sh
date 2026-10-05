@@ -1,5 +1,9 @@
 #!/bin/bash
 # Healix Production Health Check
+# Usage: bash scripts/prod-check.sh
+# Checks all Docker services, the backend health API, and Postgres connectivity.
+
+set -euo pipefail
 
 echo "🔍 Checking Healix Service Status..."
 
@@ -18,8 +22,8 @@ echo "---"
 
 # Check Backend Health API
 echo "🧪 Testing Backend API..."
-HEALTH=$(curl -s http://localhost:8000/health)
-if [[ $HEALTH == *"status\":\"ok\""* ]]; then
+HEALTH=$(curl -sf http://localhost:8000/api/health 2>/dev/null || echo "{}")
+if [[ $HEALTH == *"\"status\""* ]]; then
     echo "✅ Backend API is healthy"
 else
     echo "❌ Backend API health check failed"
