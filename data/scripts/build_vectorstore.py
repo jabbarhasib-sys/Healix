@@ -2,7 +2,9 @@
 data/scripts/build_vectorstore.py
 Embeds symptom descriptions into ChromaDB for semantic search.
 Run AFTER generate_symptoms.py.
-Usage: python data/scripts/build_vectorstore.py
+Usage:
+    python data/scripts/build_vectorstore.py
+    python data/scripts/build_vectorstore.py --batch-size 64
 """
 import json
 import sys
@@ -70,5 +72,9 @@ def main():
  
  
 if __name__ == "__main__":
+    import argparse
+    p = argparse.ArgumentParser(description="Build ChromaDB vector store from symptom data.")
+    p.add_argument("--batch-size", type=int, default=32, help="Embedding batch size (default: 32)")
+    args = p.parse_args()
     main()
  
