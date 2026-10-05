@@ -11,7 +11,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+    startCommand: gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 180 --keep-alive 5
     envVars:
       - key: APP_ENV
         value: production
@@ -23,4 +23,6 @@ services:
           property: connectionString
       - key: PYTHON_VERSION
         value: "3.11.9"
+      - key: LOG_PIPELINE_STEPS
+        value: "true"
     healthCheckPath: /api/health
